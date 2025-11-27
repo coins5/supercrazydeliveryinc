@@ -229,6 +229,40 @@ class _HomeScreenState extends State<HomeScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
                       child: TextButton(
+                        onPressed: gameState.isPremium
+                            ? null
+                            : gameState.activatePremium,
+                        style: TextButton.styleFrom(
+                          backgroundColor: gameState.isPremium
+                              ? Colors.amber.withValues(alpha: 0.5)
+                              : Colors.amber,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              gameState.isPremium ? "PREMIUM" : "PREMIUM",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                            Text(
+                              gameState.isPremium ? "ACTIVE" : "x2 PERM",
+                              style: const TextStyle(fontSize: 10),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: TextButton(
                         onPressed: gameState.toggleBuyMultiplier,
                         style: TextButton.styleFrom(
                           backgroundColor: Colors.amber,

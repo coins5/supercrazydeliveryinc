@@ -62,6 +62,15 @@ class GameState extends ChangeNotifier {
 
   double _clickMultiplier = 1.0;
 
+  // Premium
+  bool _isPremium = false;
+  bool get isPremium => _isPremium;
+
+  void activatePremium() {
+    _isPremium = true;
+    notifyListeners();
+  }
+
   // Boost
   DateTime? _boostEndTime;
   bool get isBoostActive =>
@@ -118,6 +127,9 @@ class GameState extends ChangeNotifier {
     if (isBoostActive) {
       income *= 2;
     }
+    if (isPremium) {
+      income *= 2;
+    }
     return income;
   }
 
@@ -140,6 +152,9 @@ class GameState extends ChangeNotifier {
   double get clickValue {
     double value = 1.0 * _clickMultiplier;
     if (isBoostActive) {
+      value *= 2;
+    }
+    if (isPremium) {
       value *= 2;
     }
     return value;
