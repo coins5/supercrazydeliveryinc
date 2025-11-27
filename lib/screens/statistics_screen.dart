@@ -56,6 +56,18 @@ class StatisticsScreen extends StatelessWidget {
                   Icons.touch_app,
                   Colors.blue,
                 ),
+                _StatData(
+                  'Highest Money/Sec',
+                  '\$${gameState.formatNumber(gameState.highestMoneyPerSecond)}',
+                  Icons.trending_up,
+                  Colors.amberAccent,
+                ),
+                _StatData(
+                  'Total Spent',
+                  '\$${gameState.formatNumber(gameState.totalMoneySpent)}',
+                  Icons.shopping_cart,
+                  Colors.redAccent,
+                ),
               ]),
               const SizedBox(height: 24),
 
@@ -84,6 +96,12 @@ class StatisticsScreen extends StatelessWidget {
                   '${gameState.unlockedAchievementsCount} / ${gameState.achievements.length}',
                   Icons.emoji_events,
                   Colors.amberAccent,
+                ),
+                _StatData(
+                  'Evolutions',
+                  gameState.totalEvolutions.toString(),
+                  Icons.auto_awesome,
+                  Colors.deepPurple,
                 ),
               ]),
               const SizedBox(height: 24),

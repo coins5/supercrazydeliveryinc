@@ -1,4 +1,13 @@
-enum AchievementType { money, clicks, orders, playTime, unitCount }
+enum AchievementType {
+  money,
+  clicks,
+  orders,
+  playTime,
+  unitCount,
+  evolutions,
+  moneyPerSecond,
+  upgrades,
+}
 
 class Achievement {
   final String id;

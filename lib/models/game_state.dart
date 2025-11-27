@@ -25,6 +25,15 @@ class GameState extends ChangeNotifier {
   int _secondsPlayed = 0;
   String get playTime => _formatDuration(_secondsPlayed);
 
+  int _totalEvolutions = 0;
+  int get totalEvolutions => _totalEvolutions;
+
+  double _highestMoneyPerSecond = 0;
+  double get highestMoneyPerSecond => _highestMoneyPerSecond;
+
+  double _totalMoneySpent = 0;
+  double get totalMoneySpent => _totalMoneySpent;
+
   bool _useScientificNotation = false;
   bool get useScientificNotation => _useScientificNotation;
 
@@ -105,6 +114,9 @@ class GameState extends ChangeNotifier {
 
   void _tick() {
     double income = moneyPerSecond;
+    if (income > _highestMoneyPerSecond) {
+      _highestMoneyPerSecond = income;
+    }
     _money += income;
     _totalMoneyEarned += income;
 
@@ -168,20 +180,29 @@ class GameState extends ChangeNotifier {
 
     if (amountToBuy > 0 && _money >= totalCost) {
       _money -= totalCost;
+      _totalMoneySpent += totalCost;
 
       int oldCount = unit.count;
       unit.count += amountToBuy;
       int newCount = unit.count;
 
       // Check for evolution
-      if (oldCount < 100 && newCount >= 100)
+      if (oldCount < 100 && newCount >= 100) {
         evolutionNotifications.add("${unit.evolvedName} Unlocked!");
-      if (oldCount < 250 && newCount >= 250)
+        _totalEvolutions++;
+      }
+      if (oldCount < 250 && newCount >= 250) {
         evolutionNotifications.add("${unit.evolvedName} Unlocked!");
-      if (oldCount < 500 && newCount >= 500)
+        _totalEvolutions++;
+      }
+      if (oldCount < 500 && newCount >= 500) {
         evolutionNotifications.add("${unit.evolvedName} Unlocked!");
-      if (oldCount < 1000 && newCount >= 1000)
+        _totalEvolutions++;
+      }
+      if (oldCount < 1000 && newCount >= 1000) {
         evolutionNotifications.add("${unit.evolvedName} Unlocked!");
+        _totalEvolutions++;
+      }
 
       _checkAchievements();
       notifyListeners();
@@ -191,6 +212,7 @@ class GameState extends ChangeNotifier {
   void buyUpgrade(Upgrade upgrade) {
     if (_money >= upgrade.cost && !upgrade.isPurchased) {
       _money -= upgrade.cost;
+      _totalMoneySpent += upgrade.cost;
       upgrade.isPurchased = true;
 
       if (upgrade.type == UpgradeType.unitMultiplier &&
@@ -235,6 +257,15 @@ class GameState extends ChangeNotifier {
             );
             if (unit.count >= achievement.threshold) unlocked = true;
           }
+          break;
+        case AchievementType.evolutions:
+          if (_totalEvolutions >= achievement.threshold) unlocked = true;
+          break;
+        case AchievementType.moneyPerSecond:
+          if (moneyPerSecond >= achievement.threshold) unlocked = true;
+          break;
+        case AchievementType.upgrades:
+          if (totalUpgradesPurchased >= achievement.threshold) unlocked = true;
           break;
       }
 
