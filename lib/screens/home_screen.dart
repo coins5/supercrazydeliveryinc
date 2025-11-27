@@ -90,6 +90,15 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             }
 
+            // Filter visible units and upgrades
+            final visibleUnits = gameState.units.where((unit) {
+              return gameState.money >= unit.currentCost || unit.count > 0;
+            }).toList();
+
+            final visibleUpgrades = gameState.upgrades.where((upgrade) {
+              return gameState.money >= upgrade.cost && !upgrade.isPurchased;
+            }).toList();
+
             return Column(
               children: [
                 Container(
@@ -137,31 +146,54 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: TabBarView(
                     children: [
                       // Units Tab
-                      ListView.builder(
-                        itemCount: gameState.units.length,
-                        itemBuilder: (context, index) {
-                          final unit = gameState.units[index];
-                          return UnitCard(
-                            unit: unit,
-                            canAfford: gameState.money >= unit.currentCost,
-                            onBuy: () => gameState.buyUnit(unit),
-                            formatNumber: gameState.formatNumber,
-                          );
-                        },
-                      ),
+                      visibleUnits.isEmpty
+                          ? const Center(
+                              child: Text(
+                                'Deliver more packages to unlock units!',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
+                              itemCount: visibleUnits.length,
+                              itemBuilder: (context, index) {
+                                final unit = visibleUnits[index];
+                                return UnitCard(
+                                  unit: unit,
+                                  canAfford:
+                                      gameState.money >= unit.currentCost,
+                                  onBuy: () => gameState.buyUnit(unit),
+                                  formatNumber: gameState.formatNumber,
+                                );
+                              },
+                            ),
                       // Upgrades Tab
-                      ListView.builder(
-                        itemCount: gameState.upgrades.length,
-                        itemBuilder: (context, index) {
-                          final upgrade = gameState.upgrades[index];
-                          return UpgradeCard(
-                            upgrade: upgrade,
-                            canAfford: gameState.money >= upgrade.cost,
-                            onBuy: () => gameState.buyUpgrade(upgrade),
-                            formatNumber: gameState.formatNumber,
-                          );
-                        },
-                      ),
+                      visibleUpgrades.isEmpty
+                          ? const Center(
+                              child: Text(
+                                'Deliver more packages to unlock upgrades!',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
+                              itemCount: visibleUpgrades.length,
+                              itemBuilder: (context, index) {
+                                final upgrade = visibleUpgrades[index];
+                                return UpgradeCard(
+                                  upgrade: upgrade,
+                                  canAfford: gameState.money >= upgrade.cost,
+                                  onBuy: () => gameState.buyUpgrade(upgrade),
+                                  formatNumber: gameState.formatNumber,
+                                );
+                              },
+                            ),
                     ],
                   ),
                 ),
