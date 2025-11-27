@@ -23,24 +23,6 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Super Crazy Delivery Inc'),
         backgroundColor: Colors.amber,
         actions: [
-          Consumer<GameState>(
-            builder: (context, gameState, child) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: TextButton(
-                  onPressed: gameState.toggleBuyMultiplier,
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.white.withOpacity(0.2),
-                    foregroundColor: Colors.white,
-                  ),
-                  child: Text(
-                    "x${gameState.buyMultiplier == -1 ? 'MAX' : gameState.buyMultiplier}",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              );
-            },
-          ),
           IconButton(
             icon: const Icon(Icons.emoji_events),
             onPressed: () {
@@ -189,6 +171,76 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: TextButton(
+                        onPressed:
+                            (gameState.isBoostActive &&
+                                gameState.boostRemainingTime.inMinutes >=
+                                    (23 * 60 + 30))
+                            ? null
+                            : gameState.activateBoost,
+                        style: TextButton.styleFrom(
+                          backgroundColor: gameState.isBoostActive
+                              ? Colors.green.withValues(alpha: 0.2)
+                              : Colors.redAccent,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              gameState.isBoostActive
+                                  ? "BOOST ACTIVE"
+                                  : "BOOST x2",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                            if (gameState.isBoostActive)
+                              Text(
+                                gameState.boostRemainingTime.inMinutes >=
+                                        (23 * 60 + 30)
+                                    ? "MAX (24h)"
+                                    : gameState.boostRemainingTime
+                                          .toString()
+                                          .split('.')
+                                          .first,
+                                style: const TextStyle(fontSize: 10),
+                              )
+                            else
+                              const Text("4h", style: TextStyle(fontSize: 10)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: TextButton(
+                        onPressed: gameState.toggleBuyMultiplier,
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.amber,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: Text(
+                          "x${gameState.buyMultiplier == -1 ? 'MAX' : gameState.buyMultiplier}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Expanded(

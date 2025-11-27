@@ -62,6 +62,30 @@ class GameState extends ChangeNotifier {
 
   double _clickMultiplier = 1.0;
 
+  // Boost
+  DateTime? _boostEndTime;
+  bool get isBoostActive =>
+      _boostEndTime != null && _boostEndTime!.isAfter(DateTime.now());
+  Duration get boostRemainingTime =>
+      isBoostActive ? _boostEndTime!.difference(DateTime.now()) : Duration.zero;
+
+  void activateBoost() {
+    final now = DateTime.now();
+    if (_boostEndTime == null || _boostEndTime!.isBefore(now)) {
+      _boostEndTime = now.add(const Duration(hours: 4));
+    } else {
+      _boostEndTime = _boostEndTime!.add(const Duration(hours: 4));
+    }
+
+    // Cap at 24 hours from now
+    final maxEndTime = now.add(const Duration(hours: 24));
+    if (_boostEndTime!.isAfter(maxEndTime)) {
+      _boostEndTime = maxEndTime;
+    }
+
+    notifyListeners();
+  }
+
   Timer? _timer;
 
   List<DeliveryUnit> units = getDefaultUnits();
@@ -91,6 +115,9 @@ class GameState extends ChangeNotifier {
     for (var unit in units) {
       income += unit.totalIncome;
     }
+    if (isBoostActive) {
+      income *= 2;
+    }
     return income;
   }
 
@@ -110,7 +137,13 @@ class GameState extends ChangeNotifier {
     return achievements.where((a) => a.isUnlocked).length;
   }
 
-  double get clickValue => 1.0 * _clickMultiplier;
+  double get clickValue {
+    double value = 1.0 * _clickMultiplier;
+    if (isBoostActive) {
+      value *= 2;
+    }
+    return value;
+  }
 
   void _tick() {
     double income = moneyPerSecond;
