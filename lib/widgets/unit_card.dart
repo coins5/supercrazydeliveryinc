@@ -5,12 +5,14 @@ class UnitCard extends StatelessWidget {
   final DeliveryUnit unit;
   final VoidCallback onBuy;
   final bool canAfford;
+  final String Function(double) formatNumber;
 
   const UnitCard({
     super.key,
     required this.unit,
     required this.onBuy,
     required this.canAfford,
+    required this.formatNumber,
   });
 
   @override
@@ -35,13 +37,13 @@ class UnitCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text('Owned: ${unit.count}'),
-                  Text('Income: \$${unit.baseIncome}/s'),
+                  Text('Income: \$${formatNumber(unit.baseIncome)}/s'),
                 ],
               ),
             ),
             Column(
               children: [
-                Text('\$${unit.currentCost.toStringAsFixed(0)}'),
+                Text('\$${formatNumber(unit.currentCost)}'),
                 ElevatedButton(
                   onPressed: canAfford ? onBuy : null,
                   child: const Text('BUY'),

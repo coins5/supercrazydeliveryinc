@@ -5,12 +5,14 @@ class UpgradeCard extends StatelessWidget {
   final Upgrade upgrade;
   final bool canAfford;
   final VoidCallback onBuy;
+  final String Function(double) formatNumber;
 
   const UpgradeCard({
     super.key,
     required this.upgrade,
     required this.canAfford,
     required this.onBuy,
+    required this.formatNumber,
   });
 
   @override
@@ -41,7 +43,7 @@ class UpgradeCard extends StatelessWidget {
             else
               ElevatedButton(
                 onPressed: canAfford ? onBuy : null,
-                child: Text('\$${upgrade.cost.toStringAsFixed(0)}'),
+                child: Text('\$${formatNumber(upgrade.cost)}'),
               ),
           ],
         ),

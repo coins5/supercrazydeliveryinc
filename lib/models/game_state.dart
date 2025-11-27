@@ -10,6 +10,27 @@ class GameState extends ChangeNotifier {
   double _money = 0;
   double get money => _money;
 
+  // Statistics
+  int _totalClicks = 0;
+  int get totalClicks => _totalClicks;
+
+  double _totalMoneyEarned = 0;
+  double get totalMoneyEarned => _totalMoneyEarned;
+
+  int _totalOrders = 0;
+  int get totalOrders => _totalOrders;
+
+  int _secondsPlayed = 0;
+  String get playTime => _formatDuration(_secondsPlayed);
+
+  bool _useScientificNotation = false;
+  bool get useScientificNotation => _useScientificNotation;
+
+  void toggleNumberFormat() {
+    _useScientificNotation = !_useScientificNotation;
+    notifyListeners();
+  }
+
   Timer? _timer;
 
   List<DeliveryUnit> units = getDefaultUnits();
@@ -26,17 +47,36 @@ class GameState extends ChangeNotifier {
     });
   }
 
-  void _tick() {
+  double get moneyPerSecond {
     double income = 0;
     for (var unit in units) {
       income += unit.totalIncome;
     }
+    return income;
+  }
+
+  void _tick() {
+    double income = moneyPerSecond;
     _money += income;
+    _totalMoneyEarned += income;
+
+    // Assume each unit delivers 1 order per second
+    int orders = 0;
+    for (var unit in units) {
+      orders += unit.count;
+    }
+    _totalOrders += orders;
+
+    _secondsPlayed++;
     notifyListeners();
   }
 
   void click() {
-    _money += 1; // Base click value
+    double clickValue = 1; // Base click value
+    _money += clickValue;
+    _totalMoneyEarned += clickValue;
+    _totalClicks++;
+    _totalOrders++;
     notifyListeners();
   }
 
@@ -65,6 +105,46 @@ class GameState extends ChangeNotifier {
 
       notifyListeners();
     }
+  }
+
+  String formatNumber(double value) {
+    if (_useScientificNotation) {
+      return value.toStringAsExponential(2);
+    }
+
+    if (value < 1000) return value.toStringAsFixed(0);
+
+    const suffixes = [
+      "",
+      "K",
+      "M",
+      "B",
+      "T",
+      "Qa",
+      "Qi",
+      "Sx",
+      "Sp",
+      "Oc",
+      "No",
+      "Dc",
+    ];
+    int suffixIndex = 0;
+    double v = value;
+
+    while (v >= 1000 && suffixIndex < suffixes.length - 1) {
+      v /= 1000;
+      suffixIndex++;
+    }
+
+    return "${v.toStringAsFixed(2)}${suffixes[suffixIndex]}";
+  }
+
+  String _formatDuration(int seconds) {
+    final duration = Duration(seconds: seconds);
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 
   @override
