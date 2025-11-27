@@ -62,6 +62,24 @@ class GameState extends ChangeNotifier {
     return income;
   }
 
+  int get totalUnitsPurchased {
+    int count = 0;
+    for (var unit in units) {
+      count += unit.count;
+    }
+    return count;
+  }
+
+  int get totalUpgradesPurchased {
+    return upgrades.where((u) => u.isPurchased).length;
+  }
+
+  int get unlockedAchievementsCount {
+    return achievements.where((a) => a.isUnlocked).length;
+  }
+
+  double get clickValue => 1.0; // Currently hardcoded, but good to expose
+
   void _tick() {
     double income = moneyPerSecond;
     _money += income;
