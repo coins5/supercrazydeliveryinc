@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'delivery_unit.dart';
 import 'upgrade.dart';
+import 'achievement.dart';
 
 import '../data/default_units.dart';
 import '../data/default_upgrades.dart';
+import '../data/default_achievements.dart';
 
 class GameState extends ChangeNotifier {
   double _money = 0;
@@ -37,6 +39,11 @@ class GameState extends ChangeNotifier {
 
   List<Upgrade> upgrades = getDefaultUpgrades();
 
+  List<Achievement> achievements = getDefaultAchievements();
+
+  // Queue for showing achievement notifications
+  List<Achievement> unlockedQueue = [];
+
   GameState() {
     _startTimer();
   }
@@ -68,6 +75,7 @@ class GameState extends ChangeNotifier {
     _totalOrders += orders;
 
     _secondsPlayed++;
+    _checkAchievements();
     notifyListeners();
   }
 
@@ -77,6 +85,7 @@ class GameState extends ChangeNotifier {
     _totalMoneyEarned += clickValue;
     _totalClicks++;
     _totalOrders++;
+    _checkAchievements();
     notifyListeners();
   }
 
@@ -84,6 +93,7 @@ class GameState extends ChangeNotifier {
     if (_money >= unit.currentCost) {
       _money -= unit.currentCost;
       unit.count++;
+      _checkAchievements();
       notifyListeners();
     }
   }
@@ -105,6 +115,46 @@ class GameState extends ChangeNotifier {
 
       notifyListeners();
     }
+  }
+
+  void _checkAchievements() {
+    for (var achievement in achievements) {
+      if (achievement.isUnlocked) continue;
+
+      bool unlocked = false;
+      switch (achievement.type) {
+        case AchievementType.money:
+          if (_totalMoneyEarned >= achievement.threshold) unlocked = true;
+          break;
+        case AchievementType.clicks:
+          if (_totalClicks >= achievement.threshold) unlocked = true;
+          break;
+        case AchievementType.orders:
+          if (_totalOrders >= achievement.threshold) unlocked = true;
+          break;
+        case AchievementType.playTime:
+          if (_secondsPlayed >= achievement.threshold) unlocked = true;
+          break;
+        case AchievementType.unitCount:
+          if (achievement.targetUnitId != null) {
+            final unit = units.firstWhere(
+              (u) => u.id == achievement.targetUnitId,
+              orElse: () => units.first,
+            );
+            if (unit.count >= achievement.threshold) unlocked = true;
+          }
+          break;
+      }
+
+      if (unlocked) {
+        achievement.isUnlocked = true;
+        unlockedQueue.add(achievement);
+      }
+    }
+  }
+
+  void clearUnlockedQueue() {
+    unlockedQueue.clear();
   }
 
   String formatNumber(double value) {

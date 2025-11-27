@@ -4,12 +4,53 @@ import '../models/game_state.dart';
 import '../widgets/unit_card.dart';
 import '../widgets/upgrade_card.dart';
 import 'statistics_screen.dart';
+import 'achievements_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
   Widget build(BuildContext context) {
+    // Check for unlocked achievements and show snackbar
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final gameState = Provider.of<GameState>(context, listen: false);
+      if (gameState.unlockedQueue.isNotEmpty) {
+        for (var achievement in gameState.unlockedQueue) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.emoji_events, color: Colors.amber),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Achievement Unlocked!',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(achievement.name),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.green[800],
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+        gameState.clearUnlockedQueue();
+      }
+    });
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -17,6 +58,17 @@ class HomeScreen extends StatelessWidget {
           title: const Text('Super Crazy Delivery Inc'),
           backgroundColor: Colors.amber,
           actions: [
+            IconButton(
+              icon: const Icon(Icons.emoji_events),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AchievementsScreen(),
+                  ),
+                );
+              },
+            ),
             IconButton(
               icon: const Icon(Icons.bar_chart),
               onPressed: () {
