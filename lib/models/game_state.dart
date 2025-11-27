@@ -33,6 +33,26 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
+  int _buyMultiplier = 1;
+  int get buyMultiplier => _buyMultiplier;
+
+  void toggleBuyMultiplier() {
+    if (_buyMultiplier == 1) {
+      _buyMultiplier = 10;
+    } else if (_buyMultiplier == 10) {
+      _buyMultiplier = 100;
+    } else if (_buyMultiplier == 100) {
+      _buyMultiplier = 1000;
+    } else if (_buyMultiplier == 1000) {
+      _buyMultiplier = -1; // MAX
+    } else {
+      _buyMultiplier = 1;
+    }
+    notifyListeners();
+  }
+
+  double _clickMultiplier = 1.0;
+
   Timer? _timer;
 
   List<DeliveryUnit> units = getDefaultUnits();
@@ -81,7 +101,7 @@ class GameState extends ChangeNotifier {
     return achievements.where((a) => a.isUnlocked).length;
   }
 
-  double get clickValue => 1.0; // Currently hardcoded, but good to expose
+  double get clickValue => 1.0 * _clickMultiplier;
 
   void _tick() {
     double income = moneyPerSecond;
@@ -110,18 +130,58 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
+  ({double cost, int amount}) getBuyInfo(DeliveryUnit unit) {
+    int amountToBuy = 0;
+    double totalCost = 0;
+
+    if (_buyMultiplier == -1) {
+      double tempCost = 0;
+      int tempCount = 0;
+      double currentUnitCost = unit.baseCost * (1 + 0.15 * unit.count);
+
+      while (_money >= tempCost + currentUnitCost) {
+        tempCost += currentUnitCost;
+        tempCount++;
+        currentUnitCost = unit.baseCost * (1 + 0.15 * (unit.count + tempCount));
+
+        if (tempCount >= 10000) break;
+      }
+
+      amountToBuy = tempCount;
+      totalCost = tempCost;
+    } else {
+      amountToBuy = _buyMultiplier;
+      double tempCost = 0;
+      for (int i = 0; i < amountToBuy; i++) {
+        tempCost += unit.baseCost * (1 + 0.15 * (unit.count + i));
+      }
+      totalCost = tempCost;
+    }
+
+    return (cost: totalCost, amount: amountToBuy);
+  }
+
   void buyUnit(DeliveryUnit unit) {
-    if (_money >= unit.currentCost) {
-      _money -= unit.currentCost;
-      unit.count++;
+    final buyInfo = getBuyInfo(unit);
+    final amountToBuy = buyInfo.amount;
+    final totalCost = buyInfo.cost;
+
+    if (amountToBuy > 0 && _money >= totalCost) {
+      _money -= totalCost;
+
+      int oldCount = unit.count;
+      unit.count += amountToBuy;
+      int newCount = unit.count;
 
       // Check for evolution
-      if (unit.count == 100 ||
-          unit.count == 250 ||
-          unit.count == 500 ||
-          unit.count == 1000) {
+      if (oldCount < 100 && newCount >= 100)
         evolutionNotifications.add("${unit.evolvedName} Unlocked!");
-      }
+      if (oldCount < 250 && newCount >= 250)
+        evolutionNotifications.add("${unit.evolvedName} Unlocked!");
+      if (oldCount < 500 && newCount >= 500)
+        evolutionNotifications.add("${unit.evolvedName} Unlocked!");
+      if (oldCount < 1000 && newCount >= 1000)
+        evolutionNotifications.add("${unit.evolvedName} Unlocked!");
 
       _checkAchievements();
       notifyListeners();
@@ -141,6 +201,8 @@ class GameState extends ChangeNotifier {
         for (var unit in units) {
           unit.multiplier *= upgrade.multiplierValue;
         }
+      } else if (upgrade.type == UpgradeType.clickMultiplier) {
+        _clickMultiplier *= upgrade.multiplierValue;
       }
 
       notifyListeners();

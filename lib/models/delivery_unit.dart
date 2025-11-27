@@ -33,10 +33,10 @@ class DeliveryUnit {
   }
 
   String get evolvedName {
-    if (count >= 1000) return "Ultra Crazy $name";
-    if (count >= 500) return "Craziest $name";
-    if (count >= 250) return "Even Crazier $name";
-    if (count >= 100) return "Crazy $name";
+    if (count >= 1000) return "Godlike $name";
+    if (count >= 500) return "Quantum $name";
+    if (count >= 250) return "Radioactive $name";
+    if (count >= 100) return "Turbo $name";
     return name;
   }
 
