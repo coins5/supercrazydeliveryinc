@@ -44,6 +44,9 @@ class GameState extends ChangeNotifier {
   // Queue for showing achievement notifications
   List<Achievement> unlockedQueue = [];
 
+  // Queue for showing evolution notifications
+  List<String> evolutionNotifications = [];
+
   GameState() {
     _startTimer();
   }
@@ -111,6 +114,15 @@ class GameState extends ChangeNotifier {
     if (_money >= unit.currentCost) {
       _money -= unit.currentCost;
       unit.count++;
+
+      // Check for evolution
+      if (unit.count == 100 ||
+          unit.count == 250 ||
+          unit.count == 500 ||
+          unit.count == 1000) {
+        evolutionNotifications.add("${unit.evolvedName} Unlocked!");
+      }
+
       _checkAchievements();
       notifyListeners();
     }
@@ -173,6 +185,10 @@ class GameState extends ChangeNotifier {
 
   void clearUnlockedQueue() {
     unlockedQueue.clear();
+  }
+
+  void clearEvolutionNotifications() {
+    evolutionNotifications.clear();
   }
 
   String formatNumber(double value) {

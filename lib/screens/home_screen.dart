@@ -90,6 +90,36 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             }
 
+            // Check for evolution notifications
+            if (gameState.evolutionNotifications.isNotEmpty) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted) return;
+                for (var notification in gameState.evolutionNotifications) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.auto_awesome, color: Colors.purple),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              notification,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      backgroundColor: Colors.purple[800],
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+                gameState.clearEvolutionNotifications();
+              });
+            }
+
             // Filter visible units and upgrades
             final visibleUnits = gameState.units.where((unit) {
               return gameState.money >= unit.currentCost || unit.count > 0;

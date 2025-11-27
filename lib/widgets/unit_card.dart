@@ -28,8 +28,15 @@ class UnitCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    unit.name,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    unit.evolvedName,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: unit.evolutionMultiplier > 1
+                          ? Colors.purple
+                          : null,
+                      fontWeight: unit.evolutionMultiplier > 1
+                          ? FontWeight.bold
+                          : null,
+                    ),
                   ),
                   Text(
                     unit.description,
