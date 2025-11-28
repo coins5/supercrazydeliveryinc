@@ -5,6 +5,8 @@ import '../widgets/unit_card.dart';
 import '../widgets/upgrade_card.dart';
 import 'statistics_screen.dart';
 import 'achievements_screen.dart';
+import '../data/offline_messages.dart';
+import 'dart:math';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  bool _hasShownOfflineDialog = false;
 
   @override
   Widget build(BuildContext context) {
@@ -119,6 +122,68 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }
                 gameState.clearEvolutionNotifications();
+              });
+            }
+
+            // Check for Offline Earnings
+            if (gameState.offlineEarnings > 0 && !_hasShownOfflineDialog) {
+              _hasShownOfflineDialog = true;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted) return;
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Welcome Back!'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.access_time,
+                          size: 48,
+                          color: Colors.blue,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          offlineMessages[Random().nextInt(
+                            offlineMessages.length,
+                          )],
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'You were away for ${gameState.formatDuration(gameState.offlineSeconds)}',
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Your delivery empire earned:',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '\$${gameState.formatNumber(gameState.offlineEarnings)}',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          gameState.consumeOfflineEarnings();
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('AWESOME!'),
+                      ),
+                    ],
+                  ),
+                );
               });
             }
 
