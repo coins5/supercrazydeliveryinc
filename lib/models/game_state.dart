@@ -117,6 +117,14 @@ class GameState extends ChangeNotifier {
   int _offlineSeconds = 0;
   int get offlineSeconds => _offlineSeconds;
 
+  bool _hasShownOfflineEarnings = false;
+  bool get hasShownOfflineEarnings => _hasShownOfflineEarnings;
+
+  void markOfflineEarningsAsShown() {
+    _hasShownOfflineEarnings = true;
+    notifyListeners();
+  }
+
   void consumeOfflineEarnings() {
     _offlineEarnings = 0;
     _offlineSeconds = 0;
@@ -266,6 +274,7 @@ class GameState extends ChangeNotifier {
             _offlineEarnings = earnings;
             _money += _offlineEarnings;
             _totalMoneyEarned += _offlineEarnings;
+            _hasShownOfflineEarnings = false;
           }
         }
       }

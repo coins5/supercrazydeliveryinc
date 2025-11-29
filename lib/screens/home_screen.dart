@@ -17,7 +17,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  bool _hasShownOfflineDialog = false;
 
   @override
   Widget build(BuildContext context) {
@@ -126,10 +125,11 @@ class _HomeScreenState extends State<HomeScreen> {
             }
 
             // Check for Offline Earnings
-            if (gameState.offlineEarnings > 0 && !_hasShownOfflineDialog) {
-              _hasShownOfflineDialog = true;
+            if (gameState.offlineEarnings > 0 &&
+                !gameState.hasShownOfflineEarnings) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (!mounted) return;
+                gameState.markOfflineEarningsAsShown();
                 showDialog(
                   context: context,
                   barrierDismissible: false,
