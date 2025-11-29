@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supercrazydeliveryinc/models/game_state.dart';
 import 'package:supercrazydeliveryinc/models/achievement.dart';
-import 'package:supercrazydeliveryinc/models/delivery_unit.dart';
-import 'package:supercrazydeliveryinc/models/upgrade.dart';
 
 void main() {
   group('Statistics and Achievements Tests', () {

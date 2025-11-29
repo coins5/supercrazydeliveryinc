@@ -231,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Text(
                               'CURRENT BALANCE',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
+                                color: Colors.white.withValues(alpha: 0.7),
                                 letterSpacing: 2,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
@@ -263,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
+                                    color: Colors.white.withValues(alpha: .2),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Row(
@@ -291,7 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
+                                    color: Colors.white.withValues(alpha: .2),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Row(
@@ -318,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Text(
                               '(Tap anywhere to earn!)',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.5),
+                                color: Colors.white.withValues(alpha: .5),
                                 fontStyle: FontStyle.italic,
                                 fontSize: 12,
                               ),
@@ -515,7 +515,7 @@ class _HomeScreenState extends State<HomeScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: isActive
-              ? BorderSide(color: Colors.white.withOpacity(0.5), width: 2)
+              ? BorderSide(color: Colors.white.withValues(alpha: .5), width: 2)
               : BorderSide.none,
         ),
       ),
@@ -532,7 +532,7 @@ class _HomeScreenState extends State<HomeScreen> {
             subLabel,
             style: TextStyle(
               fontSize: 10,
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: .9),
             ),
           ),
         ],

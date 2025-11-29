@@ -145,7 +145,7 @@ class UnitCard extends StatelessWidget {
                         '\$${formatNumber(buyCost)}',
                         style: TextStyle(
                           fontSize: 10,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: .9),
                         ),
                       ),
                     ],

@@ -174,7 +174,7 @@ class StatisticsScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: stat.color.withOpacity(0.1),
+                    color: stat.color.withValues(alpha: .1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(stat.icon, color: stat.color, size: 24),
