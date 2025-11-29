@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'delivery_unit.dart';
 import 'upgrade.dart';
@@ -110,6 +111,72 @@ class GameState extends ChangeNotifier {
   // Queue for showing evolution notifications
   List<String> evolutionNotifications = [];
 
+  // Prestige
+  int _prestigeTokens = 0;
+  int get prestigeTokens => _prestigeTokens;
+
+  double get prestigeMultiplier => 1.0 + (_prestigeTokens * 0.10);
+
+  int calculatePotentialTokens() {
+    if (_totalMoneyEarned < 1000000) return 0;
+    // Formula: sqrt(totalMoney / 1M) - currentTokens
+    int potential = (math.sqrt(_totalMoneyEarned / 1000000)).floor();
+    return potential - _prestigeTokens > 0 ? potential - _prestigeTokens : 0;
+  }
+
+  void prestige() {
+    int tokensToGain = calculatePotentialTokens();
+    if (tokensToGain <= 0) return;
+
+    _prestigeTokens += tokensToGain;
+
+    // Reset Progress
+    _money = 0;
+    _totalMoneyEarned =
+        0; // Optional: Keep lifetime stats separate? Plan said reset.
+    // Actually, usually lifetime stats are kept for achievements.
+    // But for the formula to work (incremental), we might need to keep it
+    // OR change the formula to be based on "Current Run Money".
+    // Let's stick to the plan: Reset money, units, upgrades.
+    // But if we reset totalMoneyEarned, the formula sqrt(0) will be 0.
+    // So the formula MUST be based on LIFETIME earnings or we reset it and the formula is based on THIS RUN.
+    // Standard idle: Formula based on Lifetime Earnings.
+    // So we should NOT reset _totalMoneyEarned if we want the formula to be cumulative.
+    // OR if the formula is "tokens based on money THIS run", then we reset.
+    // Let's assume "Money This Run" for simplicity of the "reset" concept.
+    // So:
+    _money = 0;
+    // _totalMoneyEarned = 0; // Let's NOT reset this, so achievements stick?
+    // Wait, if I don't reset totalMoneyEarned, the formula `sqrt(total)` will always yield the SAME tokens unless I subtract `_prestigeTokens`.
+    // Yes, the formula `potential - _prestigeTokens` handles the cumulative nature.
+    // So `_totalMoneyEarned` should probably NOT be reset if it tracks "Lifetime".
+    // However, usually "Money" is reset. "Total Money Earned" is usually lifetime.
+    // Let's reset `_money` but KEEP `_totalMoneyEarned` for achievements/stats,
+    // BUT we need a `_moneyEarnedThisRun` for the prestige formula if we want it to be run-based.
+    // The plan said: "Reset _money, units, upgrades."
+    // It didn't explicitly say reset `_totalMoneyEarned`.
+    // Let's keep `_totalMoneyEarned` for achievements.
+
+    // Reset Units
+    for (var unit in units) {
+      unit.count = 0;
+      unit.multiplier = 1.0;
+    }
+
+    // Reset Upgrades
+    for (var upgrade in upgrades) {
+      upgrade.isPurchased = false;
+    }
+
+    // Reset Multipliers
+    _clickMultiplier = 1.0;
+    _highestMoneyPerSecond = 0; // Reset for this run
+
+    // Save immediately
+    _saveGame();
+    notifyListeners();
+  }
+
   // Offline Earnings
   double _offlineEarnings = 0;
   double get offlineEarnings => _offlineEarnings;
@@ -151,8 +218,13 @@ class GameState extends ChangeNotifier {
       _highestMoneyPerSecond = data['highestMoneyPerSecond'] ?? 0;
       _totalMoneySpent = data['totalMoneySpent'] ?? 0;
       _useScientificNotation = data['useScientificNotation'] ?? false;
+      _totalEvolutions = data['totalEvolutions'] ?? 0;
+      _highestMoneyPerSecond = data['highestMoneyPerSecond'] ?? 0;
+      _totalMoneySpent = data['totalMoneySpent'] ?? 0;
+      _useScientificNotation = data['useScientificNotation'] ?? false;
       _clickMultiplier = data['clickMultiplier'] ?? 1.0;
       _isPremium = data['isPremium'] ?? false;
+      _prestigeTokens = data['prestigeTokens'] ?? 0;
 
       if (data['boostEndTime'] != null) {
         _boostEndTime = DateTime.tryParse(data['boostEndTime']);
@@ -307,6 +379,7 @@ class GameState extends ChangeNotifier {
       'useScientificNotation': _useScientificNotation,
       'clickMultiplier': _clickMultiplier,
       'isPremium': _isPremium,
+      'prestigeTokens': _prestigeTokens,
       'boostEndTime': _boostEndTime?.toIso8601String(),
       'lastSaveTime': DateTime.now().toIso8601String(),
       'units': units
@@ -341,6 +414,7 @@ class GameState extends ChangeNotifier {
     if (isPremium) {
       income *= 2;
     }
+    income *= prestigeMultiplier;
     return income;
   }
 
@@ -368,6 +442,7 @@ class GameState extends ChangeNotifier {
     if (isPremium) {
       value *= 2;
     }
+    value *= prestigeMultiplier;
     return value;
   }
 

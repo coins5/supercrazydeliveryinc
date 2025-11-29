@@ -7,6 +7,7 @@ import 'statistics_screen.dart';
 import 'achievements_screen.dart';
 import '../data/offline_messages.dart';
 import 'dart:math';
+import 'prestige_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,6 +26,15 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Super Crazy Delivery Inc'),
         backgroundColor: Colors.amber,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.rocket_launch),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PrestigeScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.emoji_events),
             onPressed: () {
