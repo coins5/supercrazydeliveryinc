@@ -115,6 +115,20 @@ class GameState extends ChangeNotifier {
 
   List<Manager> managers = getDefaultManagers();
 
+  // Golden Package
+  bool _goldenPackageActive = false;
+  bool get goldenPackageActive => _goldenPackageActive;
+
+  // Position (x, y) as percentage of screen (0.0 to 1.0)
+  // We use a simple map or object to store this if we want to keep GameState pure dart
+  // But Offset is UI specific (dart:ui). Let's use simple doubles.
+  double _goldenPackageX = 0.5;
+  double _goldenPackageY = 0.5;
+  double get goldenPackageX => _goldenPackageX;
+  double get goldenPackageY => _goldenPackageY;
+
+  Timer? _goldenPackageTimer;
+
   // Prestige
   int _prestigeTokens = 0;
   int get prestigeTokens => _prestigeTokens;
@@ -495,6 +509,15 @@ class GameState extends ChangeNotifier {
       // _totalClicks += autoClicks.toInt(); // Optional: Count as real clicks? Usually no.
     }
 
+    // Golden Package Spawn Logic
+    if (!_goldenPackageActive) {
+      // 1% chance per second (approx every 100s)
+      // Let's make it a bit more frequent for testing/fun: 2%
+      if (math.Random().nextDouble() < 0.5) {
+        _spawnGoldenPackage();
+      }
+    }
+
     // Assume each unit delivers 1 order per second
     int orders = 0;
     for (var unit in units) {
@@ -643,6 +666,64 @@ class GameState extends ChangeNotifier {
       // Auto-clicks and Discounts are handled dynamically in _tick and getBuyInfo
 
       notifyListeners();
+    }
+  }
+
+  void _spawnGoldenPackage() {
+    _goldenPackageActive = true;
+    // Random position (padding 10% from edges)
+    _goldenPackageX = 0.1 + math.Random().nextDouble() * 0.8;
+    _goldenPackageY =
+        0.2 + math.Random().nextDouble() * 0.6; // Avoid top/bottom bars
+
+    notifyListeners();
+
+    // Disappear after 10 seconds
+    _goldenPackageTimer?.cancel();
+    _goldenPackageTimer = Timer(const Duration(seconds: 10), () {
+      if (_goldenPackageActive) {
+        _goldenPackageActive = false;
+        notifyListeners();
+      }
+    });
+  }
+
+  String clickGoldenPackage() {
+    if (!_goldenPackageActive) return "";
+
+    _goldenPackageActive = false;
+    _goldenPackageTimer?.cancel();
+    notifyListeners();
+
+    // Determine Reward
+    // 50% Money, 50% Boost
+    if (math.Random().nextBool()) {
+      // Money Reward: 5 minutes of current production
+      double reward = moneyPerSecond * 300;
+      // Minimum reward if production is low
+      if (reward < 1000) reward = 1000 * prestigeMultiplier;
+
+      _money += reward;
+      _totalMoneyEarned += reward;
+      notifyListeners();
+      return "Golden Package!\n+\$${formatNumber(reward)}";
+    } else {
+      // Boost Reward: x5 for 30 seconds
+      // We need a way to stack boosts or handle this.
+      // Current boost is x2 for 4h.
+      // Let's make this a "Super Boost" or just extend/add to current boost?
+      // Simpler: Just give money for now, or implement a separate "Golden Boost".
+      // Let's do a "Golden Frenzy": x5 for 30s.
+      // For simplicity in this iteration, let's just give a HUGE chunk of money or a "Time Warp" (instant 1 hour).
+
+      // Let's do Time Warp (1 Hour)
+      double reward = moneyPerSecond * 3600;
+      if (reward < 5000) reward = 5000 * prestigeMultiplier;
+
+      _money += reward;
+      _totalMoneyEarned += reward;
+      notifyListeners();
+      return "Time Warp!\n+\$${formatNumber(reward)} (1 Hour)";
     }
   }
 

@@ -9,6 +9,7 @@ import 'achievements_screen.dart';
 import '../data/offline_messages.dart';
 import 'dart:math';
 import 'prestige_screen.dart';
+import '../widgets/golden_package_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -207,296 +208,314 @@ class _HomeScreenState extends State<HomeScreen> {
               return gameState.money >= upgrade.cost && !upgrade.isPurchased;
             }).toList();
 
-            return Column(
+            return Stack(
               children: [
-                // Dashboard
-                Material(
-                  elevation: 8,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(32),
-                    bottomRight: Radius.circular(32),
-                  ),
-                  color: Colors.transparent,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.deepPurple, Colors.indigo],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(32),
-                        bottomRight: Radius.circular(32),
-                      ),
-                    ),
-                    child: InkWell(
-                      onTap: gameState.click,
+                Column(
+                  children: [
+                    // Dashboard
+                    Material(
+                      elevation: 8,
                       borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(32),
                         bottomRight: Radius.circular(32),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          children: [
-                            Text(
-                              'CURRENT BALANCE',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.7),
-                                letterSpacing: 2,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              '\$${gameState.formatNumber(gameState.money)}',
-                              style: const TextStyle(
-                                fontSize: 48,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black26,
-                                    offset: Offset(2, 2),
-                                    blurRadius: 4,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                      color: Colors.transparent,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.deepPurple, Colors.indigo],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(32),
+                            bottomRight: Radius.circular(32),
+                          ),
+                        ),
+                        child: InkWell(
+                          onTap: gameState.click,
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(32),
+                            bottomRight: Radius.circular(32),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
+                                Text(
+                                  'CURRENT BALANCE',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                    letterSpacing: 2,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: .2),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.flash_on,
-                                        color: Colors.amber,
-                                        size: 16,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '+ \$${gameState.formatNumber(gameState.moneyPerSecond)} / sec',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '\$${gameState.formatNumber(gameState.money)}',
+                                  style: const TextStyle(
+                                    fontSize: 48,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black26,
+                                        offset: Offset(2, 2),
+                                        blurRadius: 4,
                                       ),
                                     ],
                                   ),
                                 ),
-                                const SizedBox(width: 12),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: .2),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.touch_app,
-                                        color: Colors.cyanAccent,
-                                        size: 16,
+                                const SizedBox(height: 16),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
                                       ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '+ \$${gameState.formatNumber(gameState.clickValue)} / click',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(
+                                          alpha: .2,
                                         ),
+                                        borderRadius: BorderRadius.circular(20),
                                       ),
-                                    ],
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.flash_on,
+                                            color: Colors.amber,
+                                            size: 16,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '+ \$${gameState.formatNumber(gameState.moneyPerSecond)} / sec',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(
+                                          alpha: .2,
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.touch_app,
+                                            color: Colors.cyanAccent,
+                                            size: 16,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '+ \$${gameState.formatNumber(gameState.clickValue)} / click',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '(Tap anywhere to earn!)',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: .5),
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 12,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              '(Tap anywhere to earn!)',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: .5),
-                                fontStyle: FontStyle.italic,
-                                fontSize: 12,
-                              ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Control Panel
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildControlButton(
+                              context: context,
+                              onPressed:
+                                  (gameState.isBoostActive &&
+                                      gameState.boostRemainingTime.inMinutes >=
+                                          (23 * 60 + 30))
+                                  ? null
+                                  : gameState.activateBoost,
+                              isActive: gameState.isBoostActive,
+                              activeColor: Colors.green,
+                              inactiveColor: Colors.redAccent,
+                              label: gameState.isBoostActive
+                                  ? "BOOST ACTIVE"
+                                  : "BOOST x2",
+                              subLabel: gameState.isBoostActive
+                                  ? (gameState.boostRemainingTime.inMinutes >=
+                                            (23 * 60 + 30)
+                                        ? "MAX (24h)"
+                                        : gameState.boostRemainingTime
+                                              .toString()
+                                              .split('.')
+                                              .first)
+                                  : "4h",
+                              icon: Icons.rocket_launch,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildControlButton(
+                              context: context,
+                              onPressed: gameState.isPremium
+                                  ? null
+                                  : gameState.activatePremium,
+                              isActive: gameState.isPremium,
+                              activeColor: Colors.amber,
+                              inactiveColor: Colors.amber,
+                              label: "PREMIUM",
+                              subLabel: gameState.isPremium
+                                  ? "ACTIVE"
+                                  : "x2 PERM",
+                              icon: Icons.star,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildControlButton(
+                              context: context,
+                              onPressed: gameState.toggleBuyMultiplier,
+                              isActive: true, // Always active
+                              activeColor: Colors.blue,
+                              inactiveColor: Colors.blue,
+                              label:
+                                  "BUY x${gameState.buyMultiplier == -1 ? 'MAX' : gameState.buyMultiplier}",
+                              subLabel: "MULTIPLIER",
+                              icon: Icons.shopping_cart,
                             ),
                           ],
                         ),
                       ),
                     ),
-                  ),
-                ),
 
-                // Control Panel
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildControlButton(
-                          context: context,
-                          onPressed:
-                              (gameState.isBoostActive &&
-                                  gameState.boostRemainingTime.inMinutes >=
-                                      (23 * 60 + 30))
-                              ? null
-                              : gameState.activateBoost,
-                          isActive: gameState.isBoostActive,
-                          activeColor: Colors.green,
-                          inactiveColor: Colors.redAccent,
-                          label: gameState.isBoostActive
-                              ? "BOOST ACTIVE"
-                              : "BOOST x2",
-                          subLabel: gameState.isBoostActive
-                              ? (gameState.boostRemainingTime.inMinutes >=
-                                        (23 * 60 + 30)
-                                    ? "MAX (24h)"
-                                    : gameState.boostRemainingTime
-                                          .toString()
-                                          .split('.')
-                                          .first)
-                              : "4h",
-                          icon: Icons.rocket_launch,
-                        ),
-                        const SizedBox(width: 8),
-                        _buildControlButton(
-                          context: context,
-                          onPressed: gameState.isPremium
-                              ? null
-                              : gameState.activatePremium,
-                          isActive: gameState.isPremium,
-                          activeColor: Colors.amber,
-                          inactiveColor: Colors.amber,
-                          label: "PREMIUM",
-                          subLabel: gameState.isPremium ? "ACTIVE" : "x2 PERM",
-                          icon: Icons.star,
-                        ),
-                        const SizedBox(width: 8),
-                        _buildControlButton(
-                          context: context,
-                          onPressed: gameState.toggleBuyMultiplier,
-                          isActive: true, // Always active
-                          activeColor: Colors.blue,
-                          inactiveColor: Colors.blue,
-                          label:
-                              "BUY x${gameState.buyMultiplier == -1 ? 'MAX' : gameState.buyMultiplier}",
-                          subLabel: "MULTIPLIER",
-                          icon: Icons.shopping_cart,
-                        ),
-                      ],
+                    // List
+                    Expanded(
+                      child: _selectedIndex == 0
+                          ? (visibleUnits.isEmpty
+                                ? Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.lock_outline,
+                                          size: 64,
+                                          color: Colors.grey[400],
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          'Deliver more packages to unlock units!',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey[600],
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : ListView.builder(
+                                    padding: const EdgeInsets.only(bottom: 80),
+                                    itemCount: visibleUnits.length,
+                                    itemBuilder: (context, index) {
+                                      final unit = visibleUnits[index];
+                                      final buyInfo = gameState.getBuyInfo(
+                                        unit,
+                                      );
+                                      return UnitCard(
+                                        unit: unit,
+                                        canAfford:
+                                            gameState.money >= buyInfo.cost &&
+                                            buyInfo.amount > 0,
+                                        buyCost: buyInfo.cost,
+                                        buyAmount: buyInfo.amount,
+                                        onBuy: () => gameState.buyUnit(unit),
+                                        formatNumber: gameState.formatNumber,
+                                      );
+                                    },
+                                  ))
+                          : _selectedIndex == 1
+                          ? ListView.builder(
+                              padding: const EdgeInsets.only(bottom: 80),
+                              itemCount: gameState.managers.length,
+                              itemBuilder: (context, index) {
+                                final manager = gameState.managers[index];
+                                return ManagerCard(
+                                  manager: manager,
+                                  canAfford: gameState.money >= manager.cost,
+                                  onHire: () => gameState.hireManager(manager),
+                                  formatNumber: gameState.formatNumber,
+                                );
+                              },
+                            )
+                          : (visibleUpgrades.isEmpty
+                                ? Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.lock_outline,
+                                          size: 64,
+                                          color: Colors.grey[400],
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          'Deliver more packages to unlock upgrades!',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey[600],
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : ListView.builder(
+                                    padding: const EdgeInsets.only(bottom: 80),
+                                    itemCount: visibleUpgrades.length,
+                                    itemBuilder: (context, index) {
+                                      final upgrade = visibleUpgrades[index];
+                                      return UpgradeCard(
+                                        upgrade: upgrade,
+                                        canAfford:
+                                            gameState.money >= upgrade.cost,
+                                        onBuy: () =>
+                                            gameState.buyUpgrade(upgrade),
+                                        formatNumber: gameState.formatNumber,
+                                      );
+                                    },
+                                  )),
                     ),
-                  ),
+                  ],
                 ),
-
-                // List
-                Expanded(
-                  child: _selectedIndex == 0
-                      ? (visibleUnits.isEmpty
-                            ? Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.lock_outline,
-                                      size: 64,
-                                      color: Colors.grey[400],
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'Deliver more packages to unlock units!',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey[600],
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : ListView.builder(
-                                padding: const EdgeInsets.only(bottom: 80),
-                                itemCount: visibleUnits.length,
-                                itemBuilder: (context, index) {
-                                  final unit = visibleUnits[index];
-                                  final buyInfo = gameState.getBuyInfo(unit);
-                                  return UnitCard(
-                                    unit: unit,
-                                    canAfford:
-                                        gameState.money >= buyInfo.cost &&
-                                        buyInfo.amount > 0,
-                                    buyCost: buyInfo.cost,
-                                    buyAmount: buyInfo.amount,
-                                    onBuy: () => gameState.buyUnit(unit),
-                                    formatNumber: gameState.formatNumber,
-                                  );
-                                },
-                              ))
-                      : _selectedIndex == 1
-                      ? ListView.builder(
-                          padding: const EdgeInsets.only(bottom: 80),
-                          itemCount: gameState.managers.length,
-                          itemBuilder: (context, index) {
-                            final manager = gameState.managers[index];
-                            return ManagerCard(
-                              manager: manager,
-                              canAfford: gameState.money >= manager.cost,
-                              onHire: () => gameState.hireManager(manager),
-                              formatNumber: gameState.formatNumber,
-                            );
-                          },
-                        )
-                      : (visibleUpgrades.isEmpty
-                            ? Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.lock_outline,
-                                      size: 64,
-                                      color: Colors.grey[400],
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'Deliver more packages to unlock upgrades!',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey[600],
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : ListView.builder(
-                                padding: const EdgeInsets.only(bottom: 80),
-                                itemCount: visibleUpgrades.length,
-                                itemBuilder: (context, index) {
-                                  final upgrade = visibleUpgrades[index];
-                                  return UpgradeCard(
-                                    upgrade: upgrade,
-                                    canAfford: gameState.money >= upgrade.cost,
-                                    onBuy: () => gameState.buyUpgrade(upgrade),
-                                    formatNumber: gameState.formatNumber,
-                                  );
-                                },
-                              )),
-                ),
+                // Overlays
+                const GoldenPackageWidget(),
               ],
             );
           },
