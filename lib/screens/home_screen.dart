@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/game_state.dart';
 import '../widgets/unit_card.dart';
 import '../widgets/upgrade_card.dart';
+import '../widgets/manager_card.dart';
 import 'statistics_screen.dart';
 import 'achievements_screen.dart';
 import '../data/offline_messages.dart';
@@ -446,6 +447,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                   );
                                 },
                               ))
+                      : _selectedIndex == 1
+                      ? ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 80),
+                          itemCount: gameState.managers.length,
+                          itemBuilder: (context, index) {
+                            final manager = gameState.managers[index];
+                            return ManagerCard(
+                              manager: manager,
+                              canAfford: gameState.money >= manager.cost,
+                              onHire: () => gameState.hireManager(manager),
+                              formatNumber: gameState.formatNumber,
+                            );
+                          },
+                        )
                       : (visibleUpgrades.isEmpty
                             ? Center(
                                 child: Column(
@@ -499,6 +514,7 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.local_shipping),
             label: 'Units',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Managers'),
           BottomNavigationBarItem(icon: Icon(Icons.upgrade), label: 'Upgrades'),
         ],
       ),

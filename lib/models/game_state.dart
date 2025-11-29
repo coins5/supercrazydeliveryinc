@@ -4,10 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'delivery_unit.dart';
 import 'upgrade.dart';
 import 'achievement.dart';
+import 'manager.dart';
 
 import '../data/default_units.dart';
 import '../data/default_upgrades.dart';
 import '../data/default_achievements.dart';
+import '../data/default_managers.dart';
 import '../services/persistence_service.dart';
 
 class GameState extends ChangeNotifier {
@@ -111,6 +113,8 @@ class GameState extends ChangeNotifier {
   // Queue for showing evolution notifications
   List<String> evolutionNotifications = [];
 
+  List<Manager> managers = getDefaultManagers();
+
   // Prestige
   int _prestigeTokens = 0;
   int get prestigeTokens => _prestigeTokens;
@@ -166,6 +170,11 @@ class GameState extends ChangeNotifier {
     // Reset Upgrades
     for (var upgrade in upgrades) {
       upgrade.isPurchased = false;
+    }
+
+    // Reset Managers
+    for (var manager in managers) {
+      manager.isHired = false;
     }
 
     // Reset Multipliers
@@ -252,6 +261,18 @@ class GameState extends ChangeNotifier {
             orElse: () => upgrades.first,
           );
           upgrade.isPurchased = upgradeData['isPurchased'] ?? false;
+        }
+      }
+
+      // Load Managers
+      if (data['managers'] != null) {
+        final List<dynamic> managersData = data['managers'];
+        for (var managerData in managersData) {
+          final manager = managers.firstWhere(
+            (m) => m.id == managerData['id'],
+            orElse: () => managers.first,
+          );
+          manager.isHired = managerData['isHired'] ?? false;
         }
       }
 
@@ -390,6 +411,9 @@ class GameState extends ChangeNotifier {
       'upgrades': upgrades
           .map((u) => {'id': u.id, 'isPurchased': u.isPurchased})
           .toList(),
+      'managers': managers
+          .map((m) => {'id': m.id, 'isHired': m.isHired})
+          .toList(),
       'achievements': achievements
           .map((a) => {'id': a.id, 'isUnlocked': a.isUnlocked})
           .toList(),
@@ -454,6 +478,23 @@ class GameState extends ChangeNotifier {
     _money += income;
     _totalMoneyEarned += income;
 
+    // Auto-Clicks from Managers
+    double autoClicks = 0;
+    for (var manager in managers) {
+      if (manager.isHired && manager.type == ManagerType.autoClick) {
+        autoClicks += manager.value;
+      }
+    }
+    if (autoClicks > 0) {
+      // We treat auto-clicks as "clicks" for stats? Maybe separate?
+      // Let's just add the money for now.
+      // 1 click = clickValue.
+      double autoClickMoney = autoClicks * clickValue;
+      _money += autoClickMoney;
+      _totalMoneyEarned += autoClickMoney;
+      // _totalClicks += autoClicks.toInt(); // Optional: Count as real clicks? Usually no.
+    }
+
     // Assume each unit delivers 1 order per second
     int orders = 0;
     for (var unit in units) {
@@ -511,6 +552,15 @@ class GameState extends ChangeNotifier {
       totalCost = tempCost;
     }
 
+    // Apply Manager Discounts
+    double discount = 0;
+    for (var manager in managers) {
+      if (manager.isHired && manager.type == ManagerType.discount) {
+        discount += manager.value;
+      }
+    }
+    totalCost *= (1 - discount);
+
     return (cost: totalCost, amount: amountToBuy);
   }
 
@@ -567,6 +617,30 @@ class GameState extends ChangeNotifier {
       } else if (upgrade.type == UpgradeType.clickMultiplier) {
         _clickMultiplier *= upgrade.multiplierValue;
       }
+
+      notifyListeners();
+    }
+  }
+
+  void hireManager(Manager manager) {
+    if (_money >= manager.cost && !manager.isHired) {
+      _money -= manager.cost;
+      _totalMoneySpent += manager.cost;
+      manager.isHired = true;
+
+      if (manager.type == ManagerType.unitBoost &&
+          manager.targetUnitId != null) {
+        final unit = units.firstWhere(
+          (u) => u.id == manager.targetUnitId,
+          orElse: () => units.first, // Fallback to avoid crash
+        );
+        // Only apply if we actually found the target unit (or if fallback is acceptable logic,
+        // but here we just want to avoid the crash. Ideally we check if ID matches).
+        if (unit.id == manager.targetUnitId) {
+          unit.multiplier *= manager.value;
+        }
+      }
+      // Auto-clicks and Discounts are handled dynamically in _tick and getBuyInfo
 
       notifyListeners();
     }
