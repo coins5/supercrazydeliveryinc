@@ -49,8 +49,8 @@ class _GoldenPackageWidgetState extends State<GoldenPackageWidget>
           alignment: Alignment(alignX, alignY),
           child: GestureDetector(
             onTap: () {
-              final message = gameState.clickGoldenPackage();
-              _showRewardDialog(context, message);
+              final result = gameState.clickGoldenPackage();
+              _showRewardDialog(context, result.message, result.story);
             },
             child: AnimatedBuilder(
               animation: _scaleAnimation,
@@ -92,7 +92,7 @@ class _GoldenPackageWidgetState extends State<GoldenPackageWidget>
     );
   }
 
-  void _showRewardDialog(BuildContext context, String message) {
+  void _showRewardDialog(BuildContext context, String message, String story) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -102,10 +102,27 @@ class _GoldenPackageWidgetState extends State<GoldenPackageWidget>
           textAlign: TextAlign.center,
           style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
         ),
-        content: Text(
-          message,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 16),
+            Text(
+              story,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                fontStyle: FontStyle.italic,
+                color: Colors.grey[800],
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(

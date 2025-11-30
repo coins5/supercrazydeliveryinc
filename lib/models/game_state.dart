@@ -10,6 +10,7 @@ import '../data/default_units.dart';
 import '../data/default_upgrades.dart';
 import '../data/default_achievements.dart';
 import '../data/default_managers.dart';
+import '../data/golden_stories.dart';
 import '../services/persistence_service.dart';
 
 class GameState extends ChangeNotifier {
@@ -704,12 +705,15 @@ class GameState extends ChangeNotifier {
     });
   }
 
-  String clickGoldenPackage() {
-    if (!_goldenPackageActive) return "";
+  ({String message, String story}) clickGoldenPackage() {
+    if (!_goldenPackageActive) return (message: "", story: "");
 
     _goldenPackageActive = false;
     _goldenPackageTimer?.cancel();
     notifyListeners();
+
+    // Pick a random story
+    final story = goldenStories[math.Random().nextInt(goldenStories.length)];
 
     // Determine Reward
     // 50% Money, 50% Boost
@@ -724,7 +728,10 @@ class GameState extends ChangeNotifier {
       _totalGoldenPackagesClicked++;
       _checkAchievements();
       notifyListeners();
-      return "Golden Package!\n+\$${formatNumber(reward)}";
+      return (
+        message: "Golden Package!\n+\$${formatNumber(reward)}",
+        story: story,
+      );
     } else {
       // Boost Reward: x5 for 30 seconds
       // We need a way to stack boosts or handle this.
@@ -743,7 +750,10 @@ class GameState extends ChangeNotifier {
       _totalGoldenPackagesClicked++;
       _checkAchievements();
       notifyListeners();
-      return "Time Warp!\n+\$${formatNumber(reward)} (1 Hour)";
+      return (
+        message: "Time Warp!\n+\$${formatNumber(reward)} (1 Hour)",
+        story: story,
+      );
     }
   }
 
