@@ -552,7 +552,7 @@ class GameState extends ChangeNotifier {
     if (!_goldenPackageActive) {
       // 1% chance per second (approx every 100s)
       // Let's make it a bit more frequent for testing/fun: 2%
-      if (math.Random().nextDouble() < 0.02) {
+      if (math.Random().nextDouble() < 0.01) {
         _spawnGoldenPackage();
       }
     }

@@ -411,9 +411,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               inactiveColor: Colors.amber,
                               label: "PREMIUM",
                               subLabel: gameState.isPremium
-                                  ? "ACTIVE"
+                                  ? "FOREVER"
                                   : "x2 PERM",
                               icon: Icons.star,
+                              isPremium:
+                                  true, // Special flag for premium styling
                             ),
                             const SizedBox(width: 8),
                             _buildControlButton(
@@ -640,6 +642,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String label,
     required String subLabel,
     required IconData icon,
+    bool isPremium = false,
   }) {
     return ElevatedButton(
       onPressed: onPressed,
@@ -650,9 +653,17 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: isActive ? 4 : 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: isActive
-              ? BorderSide(color: Colors.white.withValues(alpha: .5), width: 2)
-              : BorderSide.none,
+          side: (isActive && isPremium)
+              ? const BorderSide(
+                  color: Colors.white,
+                  width: 3,
+                ) // Gold/White contrast
+              : (isActive
+                    ? BorderSide(
+                        color: Colors.white.withValues(alpha: .5),
+                        width: 2,
+                      )
+                    : BorderSide.none),
         ),
       ),
       child: Column(
