@@ -480,18 +480,46 @@ class _HomeScreenState extends State<HomeScreen> {
                                     },
                                   ))
                           : _selectedIndex == 1
-                          ? ListView.builder(
-                              padding: const EdgeInsets.only(bottom: 80),
-                              itemCount: gameState.managers.length,
-                              itemBuilder: (context, index) {
-                                final manager = gameState.managers[index];
-                                return ManagerCard(
-                                  manager: manager,
-                                  canAfford: gameState.money >= manager.cost,
-                                  onHire: () => gameState.hireManager(manager),
-                                  formatNumber: gameState.formatNumber,
-                                );
-                              },
+                          ? Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: ElevatedButton.icon(
+                                    onPressed: gameState.hireAllManagers,
+                                    icon: const Icon(Icons.people_outline),
+                                    label: const Text("HIRE ALL MANAGERS"),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      foregroundColor: Colors.white,
+                                      minimumSize: const Size(
+                                        double.infinity,
+                                        50,
+                                      ),
+                                      elevation: 4,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: ListView.builder(
+                                    padding: const EdgeInsets.only(bottom: 80),
+                                    itemCount: gameState.managers.length,
+                                    itemBuilder: (context, index) {
+                                      final manager = gameState.managers[index];
+                                      return ManagerCard(
+                                        manager: manager,
+                                        canAfford:
+                                            gameState.money >= manager.cost,
+                                        onHire: () =>
+                                            gameState.hireManager(manager),
+                                        formatNumber: gameState.formatNumber,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             )
                           : (visibleUpgrades.isEmpty
                                 ? Center(
@@ -516,20 +544,54 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ],
                                     ),
                                   )
-                                : ListView.builder(
-                                    padding: const EdgeInsets.only(bottom: 80),
-                                    itemCount: visibleUpgrades.length,
-                                    itemBuilder: (context, index) {
-                                      final upgrade = visibleUpgrades[index];
-                                      return UpgradeCard(
-                                        upgrade: upgrade,
-                                        canAfford:
-                                            gameState.money >= upgrade.cost,
-                                        onBuy: () =>
-                                            gameState.buyUpgrade(upgrade),
-                                        formatNumber: gameState.formatNumber,
-                                      );
-                                    },
+                                : Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: ElevatedButton.icon(
+                                          onPressed: gameState.buyAllUpgrades,
+                                          icon: const Icon(
+                                            Icons.shopping_cart_checkout,
+                                          ),
+                                          label: const Text("BUY ALL UPGRADES"),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.green,
+                                            foregroundColor: Colors.white,
+                                            minimumSize: const Size(
+                                              double.infinity,
+                                              50,
+                                            ),
+                                            elevation: 4,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: ListView.builder(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 80,
+                                          ),
+                                          itemCount: visibleUpgrades.length,
+                                          itemBuilder: (context, index) {
+                                            final upgrade =
+                                                visibleUpgrades[index];
+                                            return UpgradeCard(
+                                              upgrade: upgrade,
+                                              canAfford:
+                                                  gameState.money >=
+                                                  upgrade.cost,
+                                              onBuy: () =>
+                                                  gameState.buyUpgrade(upgrade),
+                                              formatNumber:
+                                                  gameState.formatNumber,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   )),
                     ),
                   ],

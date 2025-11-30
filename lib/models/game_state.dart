@@ -674,6 +674,33 @@ class GameState extends ChangeNotifier {
     }
   }
 
+  void buyAllUpgrades() {
+    bool purchasedAny = false;
+    // Sort by cost to buy cheapest first? Or just iterate?
+    // Iterating is fine, but buying cheapest first maximizes count.
+    // Let's just iterate through the list as is (usually sorted by cost/id).
+    // We need a loop because buying one might make another affordable? No, cost is static.
+    // But we need to be careful about modifying the list while iterating if we were removing.
+    // We are just changing state.
+
+    // Create a list of affordable upgrades to avoid concurrent modification issues if any
+    final affordableUpgrades = upgrades
+        .where((u) => !u.isPurchased && _money >= u.cost)
+        .toList();
+
+    for (var upgrade in affordableUpgrades) {
+      if (_money >= upgrade.cost) {
+        // Check again as money decreases
+        buyUpgrade(upgrade);
+        purchasedAny = true;
+      }
+    }
+
+    if (purchasedAny) {
+      _toastController.add("All upgrades purchased!");
+    }
+  }
+
   void hireManager(Manager manager) {
     if (_money >= manager.cost && !manager.isHired) {
       _money -= manager.cost;
@@ -695,6 +722,26 @@ class GameState extends ChangeNotifier {
       // Auto-clicks and Discounts are handled dynamically in _tick and getBuyInfo
 
       notifyListeners();
+    }
+  }
+
+  void hireAllManagers() {
+    bool hiredAny = false;
+    // Create a list of affordable managers to avoid concurrent modification issues if any
+    final affordableManagers = managers
+        .where((m) => !m.isHired && _money >= m.cost)
+        .toList();
+
+    for (var manager in affordableManagers) {
+      if (_money >= manager.cost) {
+        // Check again as money decreases
+        hireManager(manager);
+        hiredAny = true;
+      }
+    }
+
+    if (hiredAny) {
+      _toastController.add("All managers hired!");
     }
   }
 
