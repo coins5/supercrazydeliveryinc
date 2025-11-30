@@ -9,11 +9,11 @@ List<Achievement> getDefaultAchievements() {
     100: 'Finger Warmup',
     500: 'Carpal Tunnel Starter',
     1000: 'Screen Smasher',
-    2500: 'Click-o-Maniac',
+    2500: 'Tap-o-Maniac',
     5000: 'Finger of Fury',
-    10000: 'Mouse Destroyer',
+    10000: 'Screen Destroyer',
     25000: 'The Chosen Clicker',
-    50000: 'Click God',
+    50000: 'Tap God',
     100000: 'Infinity Tapper',
   };
   clickMilestones.forEach((threshold, name) {
@@ -21,7 +21,7 @@ List<Achievement> getDefaultAchievements() {
       Achievement(
         id: 'clicks_$threshold',
         name: name,
-        description: 'Click the button $threshold times.',
+        description: 'Tap $threshold times.',
         type: AchievementType.clicks,
         threshold: threshold.toDouble(),
       ),

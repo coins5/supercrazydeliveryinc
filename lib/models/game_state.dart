@@ -927,13 +927,37 @@ class GameState extends ChangeNotifier {
       "Oc",
       "No",
       "Dc",
+      "Ud",
+      "Dd",
+      "Td",
+      "Qad",
+      "Qid",
+      "Sxd",
+      "Spd",
+      "Ocd",
+      "Nod",
+      "Vg",
+      "UVg",
+      "DVg",
+      "TVg",
+      "QaVg",
+      "QiVg",
+      "SxVg",
+      "SpVg",
+      "OcVg",
+      "NoVg",
+      "Tg",
     ];
     int suffixIndex = 0;
     double v = value;
 
-    while (v >= 1000 && suffixIndex < suffixes.length - 1) {
+    while (v >= 999.995) {
       v /= 1000;
       suffixIndex++;
+    }
+
+    if (suffixIndex >= suffixes.length) {
+      return value.toStringAsExponential(2);
     }
 
     return "${v.toStringAsFixed(2)}${suffixes[suffixIndex]}";
