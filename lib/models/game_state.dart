@@ -101,9 +101,12 @@ class GameState extends ChangeNotifier {
 
   Timer? _timer;
 
+  // Initialize Units first
   List<DeliveryUnit> units = getDefaultUnits();
 
-  List<Upgrade> upgrades = getDefaultUpgrades();
+  // Initialize Managers and Upgrades dependent on Units
+  late List<Manager> managers = getDefaultManagers(units);
+  late List<Upgrade> upgrades = getDefaultUpgrades(units);
 
   List<Achievement> achievements = getDefaultAchievements();
 
@@ -112,8 +115,6 @@ class GameState extends ChangeNotifier {
 
   // Queue for showing evolution notifications
   List<String> evolutionNotifications = [];
-
-  List<Manager> managers = getDefaultManagers();
 
   // Golden Package
   bool _goldenPackageActive = false;

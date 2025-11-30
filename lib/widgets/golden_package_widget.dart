@@ -40,14 +40,13 @@ class _GoldenPackageWidgetState extends State<GoldenPackageWidget>
       builder: (context, gameState, child) {
         if (!gameState.goldenPackageActive) return const SizedBox.shrink();
 
-        // Convert relative coordinates (0.0-1.0) to screen coordinates
-        final size = MediaQuery.of(context).size;
-        final left = gameState.goldenPackageX * size.width;
-        final top = gameState.goldenPackageY * size.height;
+        // Use Align for relative positioning within the Stack
+        // Map 0.0-1.0 to -1.0-1.0
+        final alignX = (gameState.goldenPackageX * 2) - 1;
+        final alignY = (gameState.goldenPackageY * 2) - 1;
 
-        return Positioned(
-          left: left - 40, // Center the 80x80 widget
-          top: top - 40,
+        return Align(
+          alignment: Alignment(alignX, alignY),
           child: GestureDetector(
             onTap: () {
               final message = gameState.clickGoldenPackage();
@@ -62,19 +61,26 @@ class _GoldenPackageWidgetState extends State<GoldenPackageWidget>
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
+                      color: Colors.white, // Solid background
                       shape: BoxShape.circle,
+                      border: Border.all(color: Colors.amber, width: 4),
                       boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
                         BoxShadow(
                           color: Colors.amber.withValues(alpha: 0.6),
                           blurRadius: 20,
-                          spreadRadius: 5,
+                          spreadRadius: 2,
                         ),
                       ],
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.card_giftcard,
-                      color: Colors.amberAccent,
-                      size: 60,
+                      color: Colors.amber[800], // Darker gold for contrast
+                      size: 48,
                     ),
                   ),
                 );
