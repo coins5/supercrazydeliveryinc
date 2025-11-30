@@ -4,91 +4,115 @@ List<Achievement> getDefaultAchievements() {
   List<Achievement> achievements = [];
 
   // 1. Clicks (10)
-  final clickMilestones = [
-    1,
-    100,
-    500,
-    1000,
-    2500,
-    5000,
-    10000,
-    25000,
-    50000,
-    100000,
-  ];
-  for (var threshold in clickMilestones) {
+  final clickMilestones = {
+    1: 'First Tap!',
+    100: 'Finger Warmup',
+    500: 'Carpal Tunnel Starter',
+    1000: 'Screen Smasher',
+    2500: 'Click-o-Maniac',
+    5000: 'Finger of Fury',
+    10000: 'Mouse Destroyer',
+    25000: 'The Chosen Clicker',
+    50000: 'Click God',
+    100000: 'Infinity Tapper',
+  };
+  clickMilestones.forEach((threshold, name) {
     achievements.add(
       Achievement(
         id: 'clicks_$threshold',
-        name: 'Clicker $threshold',
+        name: name,
         description: 'Click the button $threshold times.',
         type: AchievementType.clicks,
         threshold: threshold.toDouble(),
       ),
     );
-  }
+  });
 
   // 2. Golden Packages (5)
-  final gpMilestones = [1, 10, 25, 50, 100];
-  for (var threshold in gpMilestones) {
+  final gpMilestones = {
+    1: 'Lucky Find!',
+    10: 'Gold Digger',
+    25: 'Shiny Object Syndrome',
+    50: 'Midas Touch',
+    100: 'Golden Goose',
+  };
+  gpMilestones.forEach((threshold, name) {
     achievements.add(
       Achievement(
         id: 'golden_package_$threshold',
-        name: 'Treasure Hunter $threshold',
+        name: name,
         description: 'Click $threshold Golden Packages.',
         type: AchievementType.goldenPackages,
         threshold: threshold.toDouble(),
       ),
     );
-  }
+  });
 
   // 3. Boosts (4)
-  final boostMilestones = [1, 10, 25, 50];
-  for (var threshold in boostMilestones) {
+  final boostMilestones = {
+    1: 'Nitro Boost!',
+    10: 'Adrenaline Junkie',
+    25: 'Warp Speed',
+    50: 'Ludicrous Speed',
+  };
+  boostMilestones.forEach((threshold, name) {
     achievements.add(
       Achievement(
         id: 'boost_$threshold',
-        name: 'Speed Demon $threshold',
+        name: name,
         description: 'Activate Boost $threshold times.',
         type: AchievementType.boosts,
         threshold: threshold.toDouble(),
       ),
     );
-  }
+  });
 
   // 4. Managers (5)
-  final managerMilestones = [1, 10, 25, 50, 100];
-  for (var threshold in managerMilestones) {
+  final managerMilestones = {
+    1: "You're Hired!",
+    10: 'Middle Management',
+    25: 'Corporate Ladder',
+    50: 'Board of Directors',
+    100: 'CEO of Everything',
+  };
+  managerMilestones.forEach((threshold, name) {
     achievements.add(
       Achievement(
         id: 'manager_hired_$threshold',
-        name: 'HR Department $threshold',
+        name: name,
         description: 'Hire $threshold Managers.',
         type: AchievementType.managersHired,
         threshold: threshold.toDouble(),
       ),
     );
-  }
+  });
 
   // 5. Upgrades (6)
-  final upgradeMilestones = [10, 50, 100, 250, 500, 1000];
-  for (var threshold in upgradeMilestones) {
+  final upgradeMilestones = {
+    10: 'Upgrade Junkie',
+    50: 'Cutting Edge',
+    100: 'Future is Now',
+    250: 'Singularity Seeker',
+    500: 'Tech Overlord',
+    1000: 'God Mode',
+  };
+  upgradeMilestones.forEach((threshold, name) {
     achievements.add(
       Achievement(
         id: 'upgrades_$threshold',
-        name: 'Tech Enthusiast $threshold',
+        name: name,
         description: 'Buy $threshold Upgrades.',
         type: AchievementType.upgrades,
         threshold: threshold.toDouble(),
       ),
     );
-  }
+  });
 
   // 6. Playtime (3)
   achievements.add(
     Achievement(
       id: 'playtime_1h',
-      name: 'Getting Started',
+      name: 'Just 5 More Minutes',
       description: 'Play for 1 hour.',
       type: AchievementType.playTime,
       threshold: 3600,
@@ -97,7 +121,7 @@ List<Achievement> getDefaultAchievements() {
   achievements.add(
     Achievement(
       id: 'playtime_24h',
-      name: 'Dedicated',
+      name: 'No Life',
       description: 'Play for 24 hours.',
       type: AchievementType.playTime,
       threshold: 86400,
@@ -106,7 +130,7 @@ List<Achievement> getDefaultAchievements() {
   achievements.add(
     Achievement(
       id: 'playtime_100h',
-      name: 'Addicted',
+      name: 'Touch Grass',
       description: 'Play for 100 hours.',
       type: AchievementType.playTime,
       threshold: 360000,
@@ -114,24 +138,31 @@ List<Achievement> getDefaultAchievements() {
   );
 
   // 7. Evolutions (6)
-  final evolutionMilestones = [1, 5, 10, 25, 50, 100];
-  for (var threshold in evolutionMilestones) {
+  final evolutionMilestones = {
+    1: "It's Evolving!",
+    5: "Darwin's Favorite",
+    10: 'Mutant Army',
+    25: 'Genetic Freak',
+    50: 'Apex Predator',
+    100: 'Ultimate Lifeform',
+  };
+  evolutionMilestones.forEach((threshold, name) {
     achievements.add(
       Achievement(
         id: 'evolution_$threshold',
-        name: 'Evolution Master $threshold',
+        name: name,
         description: 'Evolve units $threshold times.',
         type: AchievementType.evolutions,
         threshold: threshold.toDouble(),
       ),
     );
-  }
+  });
 
   // 8. Completionist (3)
   achievements.add(
     Achievement(
       id: 'all_units',
-      name: 'Gotta Catch \'Em All',
+      name: 'Monopoly Man',
       description: 'Unlock ALL Delivery Units.',
       type: AchievementType.allUnitsUnlocked,
       threshold: 1,
@@ -140,7 +171,7 @@ List<Achievement> getDefaultAchievements() {
   achievements.add(
     Achievement(
       id: 'all_managers',
-      name: 'Corporate Overlord',
+      name: 'Wolf of Wall Street',
       description: 'Hire ALL Managers.',
       type: AchievementType.allManagersHired,
       threshold: 1,
@@ -149,7 +180,7 @@ List<Achievement> getDefaultAchievements() {
   achievements.add(
     Achievement(
       id: 'all_upgrades',
-      name: 'Maxed Out',
+      name: 'Completionist King',
       description: 'Buy ALL Upgrades.',
       type: AchievementType.allUpgradesPurchased,
       threshold: 1,
@@ -157,23 +188,46 @@ List<Achievement> getDefaultAchievements() {
   );
 
   // 9. Money (21)
-  // Powers of 10 from 1e3 to 1e60 (every 3 orders of magnitude) + 1e100
-  for (int i = 3; i <= 60; i += 3) {
-    double val = double.parse('1e$i');
+  final moneyMilestones = {
+    3: 'Pocket Change',
+    6: 'Millionaire Status',
+    9: 'Three Comma Club',
+    12: 'Trillionaire Tycoon',
+    15: 'Quadrillionaire Quest',
+    18: 'Quintillionaire King',
+    21: 'Sextillionaire Supreme',
+    24: 'Septillionaire Sultan',
+    27: 'Octillionaire Overlord',
+    30: 'Nonillionaire Ninja',
+    33: 'Decillionaire Deity',
+    36: 'Undecillionaire Universe',
+    39: 'Duodecillionaire Dragon',
+    42: 'Tredecillionaire Titan',
+    45: 'Quattuordecillionaire Quasar',
+    48: 'Quindecillionaire Quantum',
+    51: 'Sexdecillionaire Supernova',
+    54: 'Septendecillionaire Star',
+    57: 'Octodecillionaire Oracle',
+    60: 'Novemdecillionaire Nebula',
+  };
+
+  moneyMilestones.forEach((power, name) {
+    double val = double.parse('1e$power');
     achievements.add(
       Achievement(
-        id: 'money_1e$i',
-        name: 'Wealth 1e$i',
-        description: 'Earn \$1e$i.',
+        id: 'money_1e$power',
+        name: name,
+        description: 'Earn \$1e$power.',
         type: AchievementType.money,
         threshold: val,
       ),
     );
-  }
+  });
+
   achievements.add(
     Achievement(
       id: 'money_googol',
-      name: 'Googol',
+      name: 'Infinite Money Glitch',
       description: 'Earn \$1e100.',
       type: AchievementType.money,
       threshold: 1e100,
@@ -181,8 +235,6 @@ List<Achievement> getDefaultAchievements() {
   );
 
   // 10. Unit Collectors (60)
-  // We need the IDs of the first 60 units.
-  // I'll reconstruct the list here to ensure IDs match exactly what's in default_units.dart
   final List<(String, String)> unitData = [
     ('Grandma on Skates', 'grandma'),
     ('Paper Boy', 'paper_boy'),
@@ -250,7 +302,7 @@ List<Achievement> getDefaultAchievements() {
     achievements.add(
       Achievement(
         id: 'own_${data.$2}',
-        name: 'Owner: ${data.$1}',
+        name: 'Lord of ${data.$1}s',
         description: 'Own 1 ${data.$1}.',
         type: AchievementType.unitCount,
         threshold: 1,
