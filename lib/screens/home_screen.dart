@@ -22,6 +22,24 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    // Listen for toast notifications (e.g., Auto-Save)
+    final gameState = Provider.of<GameState>(context, listen: false);
+    gameState.toastStream.listen((message) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(seconds: 1),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.grey[800],
+        ),
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

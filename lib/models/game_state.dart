@@ -124,6 +124,10 @@ class GameState extends ChangeNotifier {
   // Queue for showing evolution notifications
   List<String> evolutionNotifications = [];
 
+  // Toast Notification Stream
+  final _toastController = StreamController<String>.broadcast();
+  Stream<String> get toastStream => _toastController.stream;
+
   // Golden Package
   bool _goldenPackageActive = false;
   bool get goldenPackageActive => _goldenPackageActive;
@@ -444,6 +448,7 @@ class GameState extends ChangeNotifier {
           .toList(),
     };
     await _persistenceService.saveGame(data);
+    _toastController.add("Game Saved!");
   }
 
   void _startTimer() {
