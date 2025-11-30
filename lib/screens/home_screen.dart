@@ -11,6 +11,7 @@ import 'dart:math';
 import 'prestige_screen.dart';
 import '../widgets/golden_package_widget.dart';
 import '../widgets/crazy_dialog.dart';
+import '../widgets/fire_border.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -401,21 +402,23 @@ class _HomeScreenState extends State<HomeScreen> {
                               icon: Icons.rocket_launch,
                             ),
                             const SizedBox(width: 8),
-                            _buildControlButton(
-                              context: context,
-                              onPressed: gameState.isPremium
-                                  ? null
-                                  : gameState.activatePremium,
+                            FireBorder(
                               isActive: gameState.isPremium,
-                              activeColor: Colors.amber,
-                              inactiveColor: Colors.amber,
-                              label: "PREMIUM",
-                              subLabel: gameState.isPremium
-                                  ? "FOREVER"
-                                  : "x2 PERM",
-                              icon: Icons.star,
-                              isPremium:
-                                  true, // Special flag for premium styling
+                              child: _buildControlButton(
+                                context: context,
+                                onPressed: gameState.isPremium
+                                    ? null
+                                    : gameState.activatePremium,
+                                isActive: gameState.isPremium,
+                                activeColor: Colors.amber,
+                                inactiveColor: Colors.amber,
+                                label: "PREMIUM",
+                                subLabel: gameState.isPremium
+                                    ? "FOREVER"
+                                    : "x2 PERM",
+                                icon: Icons.star,
+                                isPremium: true,
+                              ),
                             ),
                             const SizedBox(width: 8),
                             _buildControlButton(
