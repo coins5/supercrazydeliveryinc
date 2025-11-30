@@ -1,303 +1,263 @@
 import '../models/achievement.dart';
 
 List<Achievement> getDefaultAchievements() {
-  return [
-    // Clicks
-    Achievement(
-      id: 'first_click',
-      name: 'First Step',
-      description: 'Click the button once. Easy, right?',
-      type: AchievementType.clicks,
-      threshold: 1,
-    ),
-    Achievement(
-      id: 'finger_workout',
-      name: 'Finger Workout',
-      description: 'Click 100 times. Feel the burn?',
-      type: AchievementType.clicks,
-      threshold: 100,
-    ),
-    Achievement(
-      id: 'carpal_tunnel',
-      name: 'Carpal Tunnel',
-      description: 'Click 1,000 times. Maybe take a break.',
-      type: AchievementType.clicks,
-      threshold: 1000,
-    ),
-    Achievement(
-      id: 'click_master',
-      name: 'Click Master',
-      description: 'Click 10,000 times. You are dedicated.',
-      type: AchievementType.clicks,
-      threshold: 10000,
-    ),
-    Achievement(
-      id: 'click_god',
-      name: 'Click God',
-      description: 'Click 100,000 times. Are you a robot?',
-      type: AchievementType.clicks,
-      threshold: 100000,
-    ),
+  List<Achievement> achievements = [];
 
-    // Golden Packages
-    Achievement(
-      id: 'lucky_find',
-      name: 'Lucky Find',
-      description: 'Click 1 Golden Package.',
-      type: AchievementType.goldenPackages,
-      threshold: 1,
-    ),
-    Achievement(
-      id: 'treasure_hunter',
-      name: 'Treasure Hunter',
-      description: 'Click 10 Golden Packages.',
-      type: AchievementType.goldenPackages,
-      threshold: 10,
-    ),
-    Achievement(
-      id: 'gold_rush',
-      name: 'Gold Rush',
-      description: 'Click 50 Golden Packages.',
-      type: AchievementType.goldenPackages,
-      threshold: 50,
-    ),
-    Achievement(
-      id: 'midas_touch',
-      name: 'Midas Touch',
-      description: 'Click 100 Golden Packages.',
-      type: AchievementType.goldenPackages,
-      threshold: 100,
-    ),
+  // 1. Clicks (10)
+  final clickMilestones = [
+    1,
+    100,
+    500,
+    1000,
+    2500,
+    5000,
+    10000,
+    25000,
+    50000,
+    100000,
+  ];
+  for (var threshold in clickMilestones) {
+    achievements.add(
+      Achievement(
+        id: 'clicks_$threshold',
+        name: 'Clicker $threshold',
+        description: 'Click the button $threshold times.',
+        type: AchievementType.clicks,
+        threshold: threshold.toDouble(),
+      ),
+    );
+  }
 
-    // Boosts
-    Achievement(
-      id: 'need_for_speed',
-      name: 'Need for Speed',
-      description: 'Activate Boost 1 time.',
-      type: AchievementType.boosts,
-      threshold: 1,
-    ),
-    Achievement(
-      id: 'turbo_charged',
-      name: 'Turbo Charged',
-      description: 'Activate Boost 10 times.',
-      type: AchievementType.boosts,
-      threshold: 10,
-    ),
-    Achievement(
-      id: 'warp_speed',
-      name: 'Warp Speed',
-      description: 'Activate Boost 50 times.',
-      type: AchievementType.boosts,
-      threshold: 50,
-    ),
+  // 2. Golden Packages (5)
+  final gpMilestones = [1, 10, 25, 50, 100];
+  for (var threshold in gpMilestones) {
+    achievements.add(
+      Achievement(
+        id: 'golden_package_$threshold',
+        name: 'Treasure Hunter $threshold',
+        description: 'Click $threshold Golden Packages.',
+        type: AchievementType.goldenPackages,
+        threshold: threshold.toDouble(),
+      ),
+    );
+  }
 
-    // Managers
-    Achievement(
-      id: 'hiring_manager',
-      name: 'Hiring Manager',
-      description: 'Hire 1 Manager.',
-      type: AchievementType.managersHired,
-      threshold: 1,
-    ),
-    Achievement(
-      id: 'middle_management',
-      name: 'Middle Management',
-      description: 'Hire 10 Managers.',
-      type: AchievementType.managersHired,
-      threshold: 10,
-    ),
-    Achievement(
-      id: 'executive_board',
-      name: 'Executive Board',
-      description: 'Hire 50 Managers.',
-      type: AchievementType.managersHired,
-      threshold: 50,
-    ),
-    Achievement(
-      id: 'corporate_overlord',
-      name: 'Corporate Overlord',
-      description: 'Hire ALL Managers.',
-      type: AchievementType.allManagersHired,
-      threshold: 1, // Boolean check
-    ),
+  // 3. Boosts (4)
+  final boostMilestones = [1, 10, 25, 50];
+  for (var threshold in boostMilestones) {
+    achievements.add(
+      Achievement(
+        id: 'boost_$threshold',
+        name: 'Speed Demon $threshold',
+        description: 'Activate Boost $threshold times.',
+        type: AchievementType.boosts,
+        threshold: threshold.toDouble(),
+      ),
+    );
+  }
 
-    // Units (Specific Milestones)
-    Achievement(
-      id: 'grandma_army',
-      name: 'Grandma\'s Army',
-      description: 'Own 10 Grandmas on Skates.',
-      type: AchievementType.unitCount,
-      threshold: 10,
-      targetUnitId: 'grandma',
-    ),
-    Achievement(
-      id: 'pigeon_lord',
-      name: 'Pigeon Lord',
-      description: 'Own 50 Pigeon Flocks.',
-      type: AchievementType.unitCount,
-      threshold: 50,
-      targetUnitId: 'pigeon_flock',
-    ),
-    Achievement(
-      id: 'pizza_party',
-      name: 'Pizza Party',
-      description: 'Own 25 Rocket Pizzas.',
-      type: AchievementType.unitCount,
-      threshold: 25,
-      targetUnitId: 'rocket_pizza',
-    ),
-    Achievement(
-      id: 'teleport_tech',
-      name: 'Portal Master',
-      description: 'Own 10 Teleporter Stations.',
-      type: AchievementType.unitCount,
-      threshold: 10,
-      targetUnitId: 'teleporter_station',
-    ),
-    Achievement(
-      id: 'dragon_rider',
-      name: 'Dragon Rider',
-      description: 'Own 1 Dragon Express.',
-      type: AchievementType.unitCount,
-      threshold: 1,
-      targetUnitId: 'dragon_express',
-    ),
-    Achievement(
-      id: 'galactic_empire',
-      name: 'Galactic Empire',
-      description: 'Own 10 Starship Enterprises.',
-      type: AchievementType.unitCount,
-      threshold: 10,
-      targetUnitId: 'starship_enterprise',
-    ),
-    Achievement(
-      id: 'abstract_thought',
-      name: 'Abstract Thought',
-      description: 'Own 1 Concept of Delivery.',
-      type: AchievementType.unitCount,
-      threshold: 1,
-      targetUnitId: 'concept_of_delivery',
-    ),
-    Achievement(
-      id: 'divine_intervention',
-      name: 'Divine Intervention',
-      description: 'Own 1 God of Speed.',
-      type: AchievementType.unitCount,
-      threshold: 1,
-      targetUnitId: 'god_of_speed',
-    ),
-    Achievement(
-      id: 'the_end',
-      name: 'The End?',
-      description: 'Own 1 Super Crazy Delivery Inc.',
-      type: AchievementType.unitCount,
-      threshold: 1,
-      targetUnitId: 'super_crazy_delivery_inc.',
-    ),
-    Achievement(
-      id: 'gotta_catch_em_all',
-      name: 'Gotta Catch \'Em All',
-      description: 'Unlock ALL Delivery Units.',
-      type: AchievementType.allUnitsUnlocked,
-      threshold: 1, // Boolean check
-    ),
+  // 4. Managers (5)
+  final managerMilestones = [1, 10, 25, 50, 100];
+  for (var threshold in managerMilestones) {
+    achievements.add(
+      Achievement(
+        id: 'manager_hired_$threshold',
+        name: 'HR Department $threshold',
+        description: 'Hire $threshold Managers.',
+        type: AchievementType.managersHired,
+        threshold: threshold.toDouble(),
+      ),
+    );
+  }
 
-    // Money Milestones (Exponential)
-    Achievement(
-      id: 'richie_rich',
-      name: 'Richie Rich',
-      description: 'Earn \$1,000,000.',
-      type: AchievementType.money,
-      threshold: 1e6,
-    ),
-    Achievement(
-      id: 'billionaire',
-      name: 'Billionaire',
-      description: 'Earn \$1,000,000,000.',
-      type: AchievementType.money,
-      threshold: 1e9,
-    ),
-    Achievement(
-      id: 'trillionaire',
-      name: 'Trillionaire',
-      description: 'Earn \$1,000,000,000,000.',
-      type: AchievementType.money,
-      threshold: 1e12,
-    ),
-    Achievement(
-      id: 'quadrillionaire',
-      name: 'Quadrillionaire',
-      description: 'Earn \$1e15.',
-      type: AchievementType.money,
-      threshold: 1e15,
-    ),
-    Achievement(
-      id: 'quintillionaire',
-      name: 'Quintillionaire',
-      description: 'Earn \$1e18.',
-      type: AchievementType.money,
-      threshold: 1e18,
-    ),
-    Achievement(
-      id: 'decillionaire',
-      name: 'Decillionaire',
-      description: 'Earn \$1e33.',
-      type: AchievementType.money,
-      threshold: 1e33,
-    ),
-    Achievement(
-      id: 'googol',
-      name: 'Googol',
-      description: 'Earn \$1e100.',
-      type: AchievementType.money,
-      threshold: 1e100,
-    ),
+  // 5. Upgrades (6)
+  final upgradeMilestones = [10, 50, 100, 250, 500, 1000];
+  for (var threshold in upgradeMilestones) {
+    achievements.add(
+      Achievement(
+        id: 'upgrades_$threshold',
+        name: 'Tech Enthusiast $threshold',
+        description: 'Buy $threshold Upgrades.',
+        type: AchievementType.upgrades,
+        threshold: threshold.toDouble(),
+      ),
+    );
+  }
 
-    // General Progress
+  // 6. Playtime (3)
+  achievements.add(
     Achievement(
-      id: 'upgrade_addict',
-      name: 'Upgrade Addict',
-      description: 'Buy 10 upgrades.',
-      type: AchievementType.upgrades,
-      threshold: 10,
-    ),
-    Achievement(
-      id: 'upgrade_maniac',
-      name: 'Upgrade Maniac',
-      description: 'Buy 100 upgrades.',
-      type: AchievementType.upgrades,
-      threshold: 100,
-    ),
-    Achievement(
-      id: 'upgrade_god',
-      name: 'Upgrade God',
-      description: 'Buy 500 upgrades.',
-      type: AchievementType.upgrades,
-      threshold: 500,
-    ),
-    Achievement(
-      id: 'maxed_out',
-      name: 'Maxed Out',
-      description: 'Buy ALL Upgrades.',
-      type: AchievementType.allUpgradesPurchased,
-      threshold: 1, // Boolean check
-    ),
-
-    // Playtime
-    Achievement(
-      id: 'addicted',
-      name: 'Addicted',
+      id: 'playtime_1h',
+      name: 'Getting Started',
       description: 'Play for 1 hour.',
       type: AchievementType.playTime,
       threshold: 3600,
     ),
+  );
+  achievements.add(
     Achievement(
-      id: 'dedicated',
+      id: 'playtime_24h',
       name: 'Dedicated',
       description: 'Play for 24 hours.',
       type: AchievementType.playTime,
       threshold: 86400,
     ),
+  );
+  achievements.add(
+    Achievement(
+      id: 'playtime_100h',
+      name: 'Addicted',
+      description: 'Play for 100 hours.',
+      type: AchievementType.playTime,
+      threshold: 360000,
+    ),
+  );
+
+  // 7. Evolutions (6)
+  final evolutionMilestones = [1, 5, 10, 25, 50, 100];
+  for (var threshold in evolutionMilestones) {
+    achievements.add(
+      Achievement(
+        id: 'evolution_$threshold',
+        name: 'Evolution Master $threshold',
+        description: 'Evolve units $threshold times.',
+        type: AchievementType.evolutions,
+        threshold: threshold.toDouble(),
+      ),
+    );
+  }
+
+  // 8. Completionist (3)
+  achievements.add(
+    Achievement(
+      id: 'all_units',
+      name: 'Gotta Catch \'Em All',
+      description: 'Unlock ALL Delivery Units.',
+      type: AchievementType.allUnitsUnlocked,
+      threshold: 1,
+    ),
+  );
+  achievements.add(
+    Achievement(
+      id: 'all_managers',
+      name: 'Corporate Overlord',
+      description: 'Hire ALL Managers.',
+      type: AchievementType.allManagersHired,
+      threshold: 1,
+    ),
+  );
+  achievements.add(
+    Achievement(
+      id: 'all_upgrades',
+      name: 'Maxed Out',
+      description: 'Buy ALL Upgrades.',
+      type: AchievementType.allUpgradesPurchased,
+      threshold: 1,
+    ),
+  );
+
+  // 9. Money (21)
+  // Powers of 10 from 1e3 to 1e60 (every 3 orders of magnitude) + 1e100
+  for (int i = 3; i <= 60; i += 3) {
+    double val = double.parse('1e$i');
+    achievements.add(
+      Achievement(
+        id: 'money_1e$i',
+        name: 'Wealth 1e$i',
+        description: 'Earn \$1e$i.',
+        type: AchievementType.money,
+        threshold: val,
+      ),
+    );
+  }
+  achievements.add(
+    Achievement(
+      id: 'money_googol',
+      name: 'Googol',
+      description: 'Earn \$1e100.',
+      type: AchievementType.money,
+      threshold: 1e100,
+    ),
+  );
+
+  // 10. Unit Collectors (60)
+  // We need the IDs of the first 60 units.
+  // I'll reconstruct the list here to ensure IDs match exactly what's in default_units.dart
+  final List<(String, String)> unitData = [
+    ('Grandma on Skates', 'grandma'),
+    ('Paper Boy', 'paper_boy'),
+    ('Rusty Drone', 'drone'),
+    ('Pigeon Flock', 'pigeon_flock'),
+    ('Skateboard Kid', 'skateboard_kid'),
+    ('Roller Derby Team', 'roller_derby_team'),
+    ('Unicycle Clown', 'unicycle_clown'),
+    ('Rickshaw Runner', 'rickshaw_runner'),
+    ('Shopping Cart Hero', 'shopping_cart_hero'),
+    ('Segway Tour', 'segway_tour'),
+    ('Moped Gang', 'moped_gang'),
+    ('Pizza Scooter', 'pizza_scooter'),
+    ('Golf Cart', 'golf_cart'),
+    ('Mail Truck', 'mail_truck'),
+    ('Ice Cream Van', 'ice_cream_van'),
+    ('Rocket Pizza', 'rocket_pizza'),
+    ('Monster Truck', 'monster_truck'),
+    ('Formula 1 Car', 'formula_1_car'),
+    ('Bullet Train', 'bullet_train'),
+    ('Cargo Plane', 'cargo_plane'),
+    ('Delivery Drone Swarm', 'delivery_drone_swarm'),
+    ('Robot Courier', 'robot_courier'),
+    ('Hoverboarder', 'hoverboarder'),
+    ('Jetpack Joyrider', 'jetpack_joyrider'),
+    ('Hyperloop Pod', 'hyperloop_pod'),
+    ('Package Catapult', 'package_catapult'),
+    ('Delivery Cannon', 'delivery_cannon'),
+    ('Railgun Launcher', 'railgun_launcher'),
+    ('Orbital Drop Pod', 'orbital_drop_pod'),
+    ('Teleporting Dog', 'teleporting_dog'),
+    ('Cybernetic Runner', 'cybernetic_runner'),
+    ('Anti-Gravity Van', 'anti-gravity_van'),
+    ('UFO', 'ufo'),
+    ('Alien Mothership', 'alien_mothership'),
+    ('Portal Gun', 'portal_gun'),
+    ('Teleporter Station', 'teleporter_station'),
+    ('Matter Replicator', 'matter_replicator'),
+    ('Nanobot Cloud', 'nanobot_cloud'),
+    ('Time Traveler', 'time_traveler'),
+    ('TARDIS', 'tardis'),
+    ('Running Wizard', 'running_wizard'),
+    ('Magic Carpet', 'magic_carpet'),
+    ('Broomstick Rider', 'broomstick_rider'),
+    ('Griffin Rider', 'griffin_rider'),
+    ('Dragon Express', 'dragon_express'),
+    ('Phoenix', 'phoenix'),
+    ('Pegasus', 'pegasus'),
+    ('Giant Eagle', 'giant_eagle'),
+    ('Telepathic Monk', 'telepathic_monk'),
+    ('Genie', 'genie'),
+    ('Moon Lander', 'moon_lander'),
+    ('Mars Rover', 'mars_rover'),
+    ('Solar Sailer', 'solar_sailer'),
+    ('Asteroid Miner', 'asteroid_miner'),
+    ('Comet Surfer', 'comet_surfer'),
+    ('Starship Enterprise', 'starship_enterprise'),
+    ('Dyson Sphere', 'dyson_sphere'),
+    ('Black Hole Courier', 'black_hole_courier'),
+    ('Wormhole Express', 'wormhole_express'),
+    ('Quasar Beam', 'quasar_beam'),
   ];
+
+  for (var data in unitData) {
+    achievements.add(
+      Achievement(
+        id: 'own_${data.$2}',
+        name: 'Owner: ${data.$1}',
+        description: 'Own 1 ${data.$1}.',
+        type: AchievementType.unitCount,
+        threshold: 1,
+        targetUnitId: data.$2,
+      ),
+    );
+  }
+
+  return achievements;
 }
