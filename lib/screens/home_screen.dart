@@ -474,6 +474,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         buyAmount: buyInfo.amount,
                                         onBuy: () => gameState.buyUnit(unit),
                                         formatNumber: gameState.formatNumber,
+                                        globalMultiplier:
+                                            gameState.globalMultiplier,
                                       );
                                     },
                                   ))

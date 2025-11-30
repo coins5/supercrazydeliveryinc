@@ -53,13 +53,13 @@ class PrestigeScreen extends StatelessWidget {
                   const SizedBox(height: 48),
                   _buildStatRow(
                     'Current Crazy Tokens',
-                    gameState.prestigeTokens.toString(),
+                    gameState.formatNumber(gameState.prestigeTokens.toDouble()),
                     Colors.amber,
                   ),
                   const SizedBox(height: 16),
                   _buildStatRow(
                     'Current Multiplier',
-                    'x${currentMultiplier.toStringAsFixed(1)}',
+                    'x${gameState.formatNumber(currentMultiplier)}',
                     Colors.greenAccent,
                   ),
                   const SizedBox(height: 48),
@@ -84,7 +84,7 @@ class PrestigeScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          '+$potentialTokens TOKENS',
+                          '+${gameState.formatNumber(potentialTokens.toDouble())} TOKENS',
                           style: const TextStyle(
                             color: Colors.amber,
                             fontSize: 32,
@@ -96,7 +96,7 @@ class PrestigeScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'New Multiplier: x${nextMultiplier.toStringAsFixed(1)}',
+                          'New Multiplier: x${gameState.formatNumber(nextMultiplier)}',
                           style: const TextStyle(
                             color: Colors.greenAccent,
                             fontSize: 16,

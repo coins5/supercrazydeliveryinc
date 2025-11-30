@@ -11,6 +11,7 @@ class UnitCard extends StatelessWidget {
   final String Function(double) formatNumber;
   final double buyCost;
   final int buyAmount;
+  final double globalMultiplier;
 
   const UnitCard({
     super.key,
@@ -20,6 +21,7 @@ class UnitCard extends StatelessWidget {
     required this.formatNumber,
     required this.buyCost,
     required this.buyAmount,
+    required this.globalMultiplier,
   });
 
   @override
@@ -97,7 +99,7 @@ class UnitCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '+\$${formatNumber(unit.totalIncome)}/s',
+                        '+\$${formatNumber(unit.totalIncome * globalMultiplier)}/s',
                         style: TextStyle(
                           color: Colors.green[700],
                           fontWeight: FontWeight.bold,

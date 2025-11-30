@@ -501,6 +501,18 @@ class GameState extends ChangeNotifier {
     return value;
   }
 
+  double get globalMultiplier {
+    double multiplier = 1.0;
+    if (isBoostActive) {
+      multiplier *= 2;
+    }
+    if (isPremium) {
+      multiplier *= 2;
+    }
+    multiplier *= prestigeMultiplier;
+    return multiplier;
+  }
+
   void _tick() {
     double income = moneyPerSecond;
     if (income > _highestMoneyPerSecond) {
@@ -530,7 +542,7 @@ class GameState extends ChangeNotifier {
     if (!_goldenPackageActive) {
       // 1% chance per second (approx every 100s)
       // Let's make it a bit more frequent for testing/fun: 2%
-      if (math.Random().nextDouble() < 0.5) {
+      if (math.Random().nextDouble() < 0.02) {
         _spawnGoldenPackage();
       }
     }
@@ -555,7 +567,7 @@ class GameState extends ChangeNotifier {
   }
 
   void click() {
-    double clickValue = 1; // Base click value
+    double clickValue = this.clickValue;
     _money += clickValue;
     _totalMoneyEarned += clickValue;
     _totalClicks++;
