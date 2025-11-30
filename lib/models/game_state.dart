@@ -811,9 +811,7 @@ class GameState extends ChangeNotifier {
           }
           break;
         case AchievementType.boosts:
-          if (_totalBoostsActivated >= achievement.threshold) {
-            unlocked = true;
-          }
+          if (_totalBoostsActivated >= achievement.threshold) unlocked = true;
           break;
         case AchievementType.managersHired:
           if (managers.where((m) => m.isHired).length >=
@@ -822,27 +820,81 @@ class GameState extends ChangeNotifier {
           }
           break;
         case AchievementType.allUnitsUnlocked:
-          if (units.every((u) => u.count > 0)) {
-            unlocked = true;
-          }
+          if (units.every((u) => u.count > 0)) unlocked = true;
           break;
         case AchievementType.allManagersHired:
-          if (managers.every((m) => m.isHired)) {
-            unlocked = true;
-          }
+          if (managers.every((m) => m.isHired)) unlocked = true;
           break;
         case AchievementType.allUpgradesPurchased:
-          if (upgrades.every((u) => u.isPurchased)) {
-            unlocked = true;
-          }
+          if (upgrades.every((u) => u.isPurchased)) unlocked = true;
           break;
       }
 
       if (unlocked) {
         achievement.isUnlocked = true;
         unlockedQueue.add(achievement);
+        // Save immediately when achievement unlocked
+        _saveGame();
       }
     }
+  }
+
+  double getAchievementProgress(Achievement achievement) {
+    if (achievement.isUnlocked) return 1.0;
+
+    double current = 0;
+    switch (achievement.type) {
+      case AchievementType.money:
+        current = _totalMoneyEarned;
+        break;
+      case AchievementType.clicks:
+        current = _totalClicks.toDouble();
+        break;
+      case AchievementType.playTime:
+        current = _secondsPlayed.toDouble();
+        break;
+      case AchievementType.unitCount:
+        if (achievement.targetUnitId != null) {
+          final unit = units.firstWhere(
+            (u) => u.id == achievement.targetUnitId,
+            orElse: () => units.first,
+          );
+          current = unit.count.toDouble();
+        }
+        break;
+      case AchievementType.evolutions:
+        current = _totalEvolutions.toDouble();
+        break;
+      case AchievementType.moneyPerSecond:
+        current = moneyPerSecond;
+        break;
+      case AchievementType.upgrades:
+        current = totalUpgradesPurchased.toDouble();
+        break;
+      case AchievementType.goldenPackages:
+        current = _totalGoldenPackagesClicked.toDouble();
+        break;
+      case AchievementType.boosts:
+        current = _totalBoostsActivated.toDouble();
+        break;
+      case AchievementType.managersHired:
+        current = managers.where((m) => m.isHired).length.toDouble();
+        break;
+      case AchievementType.allUnitsUnlocked:
+        current = units.where((u) => u.count > 0).length.toDouble();
+        // Threshold is technically 1 (boolean), but for progress we compare against total units
+        return current / units.length;
+      case AchievementType.allManagersHired:
+        current = managers.where((m) => m.isHired).length.toDouble();
+        return current / managers.length;
+      case AchievementType.allUpgradesPurchased:
+        current = upgrades.where((u) => u.isPurchased).length.toDouble();
+        return current / upgrades.length;
+    }
+
+    if (achievement.threshold <= 0) return 0.0;
+    double progress = current / achievement.threshold;
+    return progress.clamp(0.0, 1.0);
   }
 
   void clearUnlockedQueue() {
