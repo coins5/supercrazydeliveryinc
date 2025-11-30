@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 class DeliveryUnit {
   final String id;
   final String name;
@@ -20,7 +22,10 @@ class DeliveryUnit {
     this.evolutionStage = 0,
   });
 
-  double get currentCost {
+  double getCost(bool isHardMode) {
+    if (isHardMode) {
+      return baseCost * math.pow(1.09, count);
+    }
     return baseCost * (1 + 0.15 * count); // Simple cost scaling
   }
 

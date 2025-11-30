@@ -6,6 +6,7 @@ class UpgradeCard extends StatelessWidget {
   final bool canAfford;
   final VoidCallback onBuy;
   final String Function(double) formatNumber;
+  final bool isHardMode;
 
   const UpgradeCard({
     super.key,
@@ -13,6 +14,7 @@ class UpgradeCard extends StatelessWidget {
     required this.canAfford,
     required this.onBuy,
     required this.formatNumber,
+    required this.isHardMode,
   });
 
   @override

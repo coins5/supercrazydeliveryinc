@@ -6,6 +6,7 @@ class ManagerCard extends StatelessWidget {
   final bool canAfford;
   final VoidCallback onHire;
   final String Function(double) formatNumber;
+  final bool isHardMode;
 
   const ManagerCard({
     super.key,
@@ -13,6 +14,7 @@ class ManagerCard extends StatelessWidget {
     required this.canAfford,
     required this.onHire,
     required this.formatNumber,
+    required this.isHardMode,
   });
 
   @override

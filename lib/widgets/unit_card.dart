@@ -12,6 +12,7 @@ class UnitCard extends StatelessWidget {
   final double buyCost;
   final int buyAmount;
   final double globalMultiplier;
+  final GameState gameState;
 
   const UnitCard({
     super.key,
@@ -22,6 +23,7 @@ class UnitCard extends StatelessWidget {
     required this.buyCost,
     required this.buyAmount,
     required this.globalMultiplier,
+    required this.gameState,
   });
 
   @override
@@ -196,10 +198,10 @@ class UnitCard extends StatelessWidget {
                   'Evolutions:',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                _buildEvolutionText(100, "Turbo", unit.count),
-                _buildEvolutionText(250, "Radioactive", unit.count),
-                _buildEvolutionText(500, "Quantum", unit.count),
-                _buildEvolutionText(1000, "Godlike", unit.count),
+                _buildEvolutionText(100, "Turbo", unit.count, gameState),
+                _buildEvolutionText(250, "Radioactive", unit.count, gameState),
+                _buildEvolutionText(500, "Quantum", unit.count, gameState),
+                _buildEvolutionText(1000, "Godlike", unit.count, gameState),
               ],
             ),
           );
@@ -214,7 +216,12 @@ class UnitCard extends StatelessWidget {
     );
   }
 
-  Widget _buildEvolutionText(int threshold, String prefix, int currentCount) {
+  Widget _buildEvolutionText(
+    int threshold,
+    String prefix,
+    int currentCount,
+    GameState gameState,
+  ) {
     final isUnlocked = currentCount >= threshold;
     return Text(
       isUnlocked ? "- $prefix ${unit.name}" : "- ??????",

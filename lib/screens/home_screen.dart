@@ -78,6 +78,13 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
+          // UNCOMENT FOR DEVELOPMENT
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              _showSettingsDialog(context);
+            },
+          ),
         ],
       ),
       body: Container(
@@ -136,14 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           const Icon(Icons.auto_awesome, color: Colors.purple),
                           const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              notification,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+                          Expanded(child: Text(notification)),
                         ],
                       ),
                       backgroundColor: Colors.purple[800],
@@ -219,7 +219,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // Filter visible units and upgrades
             final visibleUnits = gameState.units.where((unit) {
-              return gameState.money >= unit.currentCost || unit.count > 0;
+              return gameState.money >= unit.getCost(gameState.isHardMode) ||
+                  unit.count > 0;
             }).toList();
 
             final visibleUpgrades = gameState.upgrades.where((upgrade) {
@@ -476,6 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         formatNumber: gameState.formatNumber,
                                         globalMultiplier:
                                             gameState.globalMultiplier,
+                                        gameState: gameState,
                                       );
                                     },
                                   ))
@@ -511,10 +513,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                       return ManagerCard(
                                         manager: manager,
                                         canAfford:
-                                            gameState.money >= manager.cost,
+                                            gameState.money >=
+                                            manager.getCost(
+                                              gameState.isHardMode,
+                                            ),
                                         onHire: () =>
                                             gameState.hireManager(manager),
                                         formatNumber: gameState.formatNumber,
+                                        isHardMode: gameState.isHardMode,
                                       );
                                     },
                                   ),
@@ -582,11 +588,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                               upgrade: upgrade,
                                               canAfford:
                                                   gameState.money >=
-                                                  upgrade.cost,
+                                                  upgrade.getCost(
+                                                    gameState.isHardMode,
+                                                  ),
                                               onBuy: () =>
                                                   gameState.buyUpgrade(upgrade),
                                               formatNumber:
                                                   gameState.formatNumber,
+                                              isHardMode: gameState.isHardMode,
                                             );
                                           },
                                         ),
@@ -664,6 +673,49 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showSettingsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Consumer<GameState>(
+          builder: (context, gameState, child) {
+            return AlertDialog(
+              title: const Text('Settings'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SwitchListTile(
+                    title: const Text('Scientific Notation'),
+                    value: gameState.useScientificNotation,
+                    onChanged: (value) {
+                      gameState.toggleNumberFormat();
+                    },
+                  ),
+                  SwitchListTile(
+                    title: const Text('Hard Mode (Production)'),
+                    subtitle: const Text('Higher costs, less prestige'),
+                    value: gameState.isHardMode,
+                    onChanged: (value) {
+                      gameState.toggleDifficulty();
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Close'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

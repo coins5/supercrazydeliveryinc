@@ -82,6 +82,15 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Difficulty
+  bool _isHardMode = true; // Default to Hard (Production)
+  bool get isHardMode => _isHardMode;
+
+  void toggleDifficulty() {
+    _isHardMode = !_isHardMode;
+    notifyListeners();
+  }
+
   // Boost
   DateTime? _boostEndTime;
   bool get isBoostActive =>
@@ -147,7 +156,8 @@ class GameState extends ChangeNotifier {
   int _prestigeTokens = 0;
   int get prestigeTokens => _prestigeTokens;
 
-  double get prestigeMultiplier => 1.0 + (_prestigeTokens * 0.10);
+  double get prestigeMultiplier =>
+      1.0 + (_prestigeTokens * (_isHardMode ? 0.02 : 0.10));
 
   int calculatePotentialTokens() {
     if (_totalMoneyEarned < 1000000) return 0;
@@ -583,12 +593,29 @@ class GameState extends ChangeNotifier {
     if (_buyMultiplier == -1) {
       double tempCost = 0;
       int tempCount = 0;
-      double currentUnitCost = unit.baseCost * (1 + 0.15 * unit.count);
+      // We need to simulate the cost increase
+      // This is tricky with the exponential formula in hard mode without a closed form sum
+      // For simplicity in this loop, we just call getCost on a temp unit copy or calculate manually
+      // But we can't easily clone.
+      // Let's just use the formula directly here to match getCost logic.
+
+      double currentUnitCost = unit.getCost(_isHardMode);
 
       while (_money >= tempCost + currentUnitCost) {
         tempCost += currentUnitCost;
         tempCount++;
-        currentUnitCost = unit.baseCost * (1 + 0.15 * (unit.count + tempCount));
+        // Calculate next cost
+        // This requires knowing the formula.
+        // Ideally getCost should take a count override, but it uses `this.count`.
+        // Let's refactor getCost to take an optional count, or just replicate logic here.
+        // Replicating logic is safer for now to avoid changing signature too much.
+        if (_isHardMode) {
+          currentUnitCost =
+              unit.baseCost * math.pow(1.09, unit.count + tempCount);
+        } else {
+          currentUnitCost =
+              unit.baseCost * (1 + 0.15 * (unit.count + tempCount));
+        }
 
         if (tempCount >= 10000) break;
       }
@@ -599,7 +626,11 @@ class GameState extends ChangeNotifier {
       amountToBuy = _buyMultiplier;
       double tempCost = 0;
       for (int i = 0; i < amountToBuy; i++) {
-        tempCost += unit.baseCost * (1 + 0.15 * (unit.count + i));
+        if (_isHardMode) {
+          tempCost += unit.baseCost * math.pow(1.09, unit.count + i);
+        } else {
+          tempCost += unit.baseCost * (1 + 0.15 * (unit.count + i));
+        }
       }
       totalCost = tempCost;
     }
@@ -653,9 +684,10 @@ class GameState extends ChangeNotifier {
   }
 
   void buyUpgrade(Upgrade upgrade) {
-    if (_money >= upgrade.cost && !upgrade.isPurchased) {
-      _money -= upgrade.cost;
-      _totalMoneySpent += upgrade.cost;
+    double cost = upgrade.getCost(_isHardMode);
+    if (_money >= cost && !upgrade.isPurchased) {
+      _money -= cost;
+      _totalMoneySpent += cost;
       upgrade.isPurchased = true;
 
       if (upgrade.type == UpgradeType.unitMultiplier &&
@@ -685,11 +717,12 @@ class GameState extends ChangeNotifier {
 
     // Create a list of affordable upgrades to avoid concurrent modification issues if any
     final affordableUpgrades = upgrades
-        .where((u) => !u.isPurchased && _money >= u.cost)
+        .where((u) => !u.isPurchased && _money >= u.getCost(_isHardMode))
         .toList();
 
     for (var upgrade in affordableUpgrades) {
-      if (_money >= upgrade.cost) {
+      double cost = upgrade.getCost(_isHardMode);
+      if (_money >= cost) {
         // Check again as money decreases
         buyUpgrade(upgrade);
         purchasedAny = true;
@@ -702,9 +735,10 @@ class GameState extends ChangeNotifier {
   }
 
   void hireManager(Manager manager) {
-    if (_money >= manager.cost && !manager.isHired) {
-      _money -= manager.cost;
-      _totalMoneySpent += manager.cost;
+    double cost = manager.getCost(_isHardMode);
+    if (_money >= cost && !manager.isHired) {
+      _money -= cost;
+      _totalMoneySpent += cost;
       manager.isHired = true;
 
       if (manager.type == ManagerType.unitBoost &&
@@ -729,11 +763,12 @@ class GameState extends ChangeNotifier {
     bool hiredAny = false;
     // Create a list of affordable managers to avoid concurrent modification issues if any
     final affordableManagers = managers
-        .where((m) => !m.isHired && _money >= m.cost)
+        .where((m) => !m.isHired && _money >= m.getCost(_isHardMode))
         .toList();
 
     for (var manager in affordableManagers) {
-      if (_money >= manager.cost) {
+      double cost = manager.getCost(_isHardMode);
+      if (_money >= cost) {
         // Check again as money decreases
         hireManager(manager);
         hiredAny = true;
