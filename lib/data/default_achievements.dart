@@ -39,6 +39,89 @@ List<Achievement> getDefaultAchievements() {
       threshold: 100000,
     ),
 
+    // Golden Packages
+    Achievement(
+      id: 'lucky_find',
+      name: 'Lucky Find',
+      description: 'Click 1 Golden Package.',
+      type: AchievementType.goldenPackages,
+      threshold: 1,
+    ),
+    Achievement(
+      id: 'treasure_hunter',
+      name: 'Treasure Hunter',
+      description: 'Click 10 Golden Packages.',
+      type: AchievementType.goldenPackages,
+      threshold: 10,
+    ),
+    Achievement(
+      id: 'gold_rush',
+      name: 'Gold Rush',
+      description: 'Click 50 Golden Packages.',
+      type: AchievementType.goldenPackages,
+      threshold: 50,
+    ),
+    Achievement(
+      id: 'midas_touch',
+      name: 'Midas Touch',
+      description: 'Click 100 Golden Packages.',
+      type: AchievementType.goldenPackages,
+      threshold: 100,
+    ),
+
+    // Boosts
+    Achievement(
+      id: 'need_for_speed',
+      name: 'Need for Speed',
+      description: 'Activate Boost 1 time.',
+      type: AchievementType.boosts,
+      threshold: 1,
+    ),
+    Achievement(
+      id: 'turbo_charged',
+      name: 'Turbo Charged',
+      description: 'Activate Boost 10 times.',
+      type: AchievementType.boosts,
+      threshold: 10,
+    ),
+    Achievement(
+      id: 'warp_speed',
+      name: 'Warp Speed',
+      description: 'Activate Boost 50 times.',
+      type: AchievementType.boosts,
+      threshold: 50,
+    ),
+
+    // Managers
+    Achievement(
+      id: 'hiring_manager',
+      name: 'Hiring Manager',
+      description: 'Hire 1 Manager.',
+      type: AchievementType.managersHired,
+      threshold: 1,
+    ),
+    Achievement(
+      id: 'middle_management',
+      name: 'Middle Management',
+      description: 'Hire 10 Managers.',
+      type: AchievementType.managersHired,
+      threshold: 10,
+    ),
+    Achievement(
+      id: 'executive_board',
+      name: 'Executive Board',
+      description: 'Hire 50 Managers.',
+      type: AchievementType.managersHired,
+      threshold: 50,
+    ),
+    Achievement(
+      id: 'corporate_overlord',
+      name: 'Corporate Overlord',
+      description: 'Hire ALL Managers.',
+      type: AchievementType.allManagersHired,
+      threshold: 1, // Boolean check
+    ),
+
     // Units (Specific Milestones)
     Achievement(
       id: 'grandma_army',
@@ -111,6 +194,13 @@ List<Achievement> getDefaultAchievements() {
       type: AchievementType.unitCount,
       threshold: 1,
       targetUnitId: 'super_crazy_delivery_inc.',
+    ),
+    Achievement(
+      id: 'gotta_catch_em_all',
+      name: 'Gotta Catch \'Em All',
+      description: 'Unlock ALL Delivery Units.',
+      type: AchievementType.allUnitsUnlocked,
+      threshold: 1, // Boolean check
     ),
 
     // Money Milestones (Exponential)
@@ -185,6 +275,13 @@ List<Achievement> getDefaultAchievements() {
       description: 'Buy 500 upgrades.',
       type: AchievementType.upgrades,
       threshold: 500,
+    ),
+    Achievement(
+      id: 'maxed_out',
+      name: 'Maxed Out',
+      description: 'Buy ALL Upgrades.',
+      type: AchievementType.allUpgradesPurchased,
+      threshold: 1, // Boolean check
     ),
 
     // Playtime

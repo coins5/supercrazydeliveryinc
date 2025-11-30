@@ -63,6 +63,18 @@ class StatisticsScreen extends StatelessWidget {
                   Colors.amberAccent,
                 ),
                 _StatData(
+                  'Golden Packages Clicked',
+                  gameState.totalGoldenPackagesClicked.toString(),
+                  Icons.card_giftcard, // Assuming an icon for golden packages
+                  Colors.yellow.shade700,
+                ),
+                _StatData(
+                  'Boosts Activated',
+                  gameState.totalBoostsActivated.toString(),
+                  Icons.rocket_launch, // Assuming an icon for boosts
+                  Colors.deepOrange,
+                ),
+                _StatData(
                   'Total Spent',
                   '\$${gameState.formatNumber(gameState.totalMoneySpent)}',
                   Icons.shopping_cart,
@@ -102,6 +114,29 @@ class StatisticsScreen extends StatelessWidget {
                   gameState.totalEvolutions.toString(),
                   Icons.auto_awesome,
                   Colors.deepPurple,
+                ),
+              ]),
+              const SizedBox(height: 24),
+
+              _buildSectionHeader(context, 'Completion', Icons.check_circle),
+              _buildStatGrid(context, [
+                _StatData(
+                  'Units Unlocked',
+                  '${gameState.units.where((u) => u.count > 0).length} / ${gameState.units.length}',
+                  Icons.store,
+                  Colors.green,
+                ),
+                _StatData(
+                  'Managers Hired',
+                  '${gameState.managers.where((m) => m.isHired).length} / ${gameState.managers.length}',
+                  Icons.people,
+                  Colors.blue,
+                ),
+                _StatData(
+                  'Upgrades Purchased',
+                  '${gameState.upgrades.where((u) => u.isPurchased).length} / ${gameState.upgrades.length}',
+                  Icons.upgrade,
+                  Colors.purple,
                 ),
               ]),
               const SizedBox(height: 24),

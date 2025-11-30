@@ -1,12 +1,17 @@
 enum AchievementType {
-  money,
   clicks,
-  orders,
-  playTime,
   unitCount,
+  money,
+  playTime,
   evolutions,
   moneyPerSecond,
   upgrades,
+  goldenPackages,
+  boosts,
+  managersHired,
+  allUnitsUnlocked,
+  allManagersHired,
+  allUpgradesPurchased,
 }
 
 class Achievement {

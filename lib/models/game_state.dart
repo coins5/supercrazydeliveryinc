@@ -38,6 +38,12 @@ class GameState extends ChangeNotifier {
   double _totalMoneySpent = 0;
   double get totalMoneySpent => _totalMoneySpent;
 
+  int _totalGoldenPackagesClicked = 0;
+  int get totalGoldenPackagesClicked => _totalGoldenPackagesClicked;
+
+  int _totalBoostsActivated = 0;
+  int get totalBoostsActivated => _totalBoostsActivated;
+
   bool _useScientificNotation = false;
   bool get useScientificNotation => _useScientificNotation;
 
@@ -96,6 +102,8 @@ class GameState extends ChangeNotifier {
       _boostEndTime = maxEndTime;
     }
 
+    _totalBoostsActivated++;
+    _checkAchievements();
     notifyListeners();
   }
 
@@ -235,16 +243,15 @@ class GameState extends ChangeNotifier {
     if (data != null) {
       _money = data['money'] ?? 0;
       _totalClicks = data['totalClicks'] ?? 0;
-      _totalMoneyEarned = data['totalMoneyEarned'] ?? 0;
+      _totalMoneyEarned = (data['totalMoneyEarned'] ?? 0).toDouble();
       _totalOrders = data['totalOrders'] ?? 0;
       _secondsPlayed = data['secondsPlayed'] ?? 0;
       _totalEvolutions = data['totalEvolutions'] ?? 0;
-      _highestMoneyPerSecond = data['highestMoneyPerSecond'] ?? 0;
-      _totalMoneySpent = data['totalMoneySpent'] ?? 0;
-      _useScientificNotation = data['useScientificNotation'] ?? false;
-      _totalEvolutions = data['totalEvolutions'] ?? 0;
-      _highestMoneyPerSecond = data['highestMoneyPerSecond'] ?? 0;
-      _totalMoneySpent = data['totalMoneySpent'] ?? 0;
+      _highestMoneyPerSecond = (data['highestMoneyPerSecond'] ?? 0).toDouble();
+      _totalMoneySpent = (data['totalMoneySpent'] ?? 0).toDouble();
+      _totalGoldenPackagesClicked = data['totalGoldenPackagesClicked'] ?? 0;
+      _totalBoostsActivated = data['totalBoostsActivated'] ?? 0;
+      _buyMultiplier = data['buyMultiplier'] ?? 1;
       _useScientificNotation = data['useScientificNotation'] ?? false;
       _clickMultiplier = data['clickMultiplier'] ?? 1.0;
       _isPremium = data['isPremium'] ?? false;
@@ -412,6 +419,9 @@ class GameState extends ChangeNotifier {
       'totalEvolutions': _totalEvolutions,
       'highestMoneyPerSecond': _highestMoneyPerSecond,
       'totalMoneySpent': _totalMoneySpent,
+      'totalGoldenPackagesClicked': _totalGoldenPackagesClicked,
+      'totalBoostsActivated': _totalBoostsActivated,
+      'buyMultiplier': _buyMultiplier,
       'useScientificNotation': _useScientificNotation,
       'clickMultiplier': _clickMultiplier,
       'isPremium': _isPremium,
@@ -706,6 +716,8 @@ class GameState extends ChangeNotifier {
 
       _money += reward;
       _totalMoneyEarned += reward;
+      _totalGoldenPackagesClicked++;
+      _checkAchievements();
       notifyListeners();
       return "Golden Package!\n+\$${formatNumber(reward)}";
     } else {
@@ -723,6 +735,8 @@ class GameState extends ChangeNotifier {
 
       _money += reward;
       _totalMoneyEarned += reward;
+      _totalGoldenPackagesClicked++;
+      _checkAchievements();
       notifyListeners();
       return "Time Warp!\n+\$${formatNumber(reward)} (1 Hour)";
     }
@@ -740,9 +754,9 @@ class GameState extends ChangeNotifier {
         case AchievementType.clicks:
           if (_totalClicks >= achievement.threshold) unlocked = true;
           break;
-        case AchievementType.orders:
-          if (_totalOrders >= achievement.threshold) unlocked = true;
-          break;
+        // case AchievementType.orders: // Deprecated
+        //   if (_totalOrders >= achievement.threshold) unlocked = true;
+        //   break;
         case AchievementType.playTime:
           if (_secondsPlayed >= achievement.threshold) unlocked = true;
           break;
@@ -763,6 +777,37 @@ class GameState extends ChangeNotifier {
           break;
         case AchievementType.upgrades:
           if (totalUpgradesPurchased >= achievement.threshold) unlocked = true;
+          break;
+        case AchievementType.goldenPackages:
+          if (_totalGoldenPackagesClicked >= achievement.threshold) {
+            unlocked = true;
+          }
+          break;
+        case AchievementType.boosts:
+          if (_totalBoostsActivated >= achievement.threshold) {
+            unlocked = true;
+          }
+          break;
+        case AchievementType.managersHired:
+          if (managers.where((m) => m.isHired).length >=
+              achievement.threshold) {
+            unlocked = true;
+          }
+          break;
+        case AchievementType.allUnitsUnlocked:
+          if (units.every((u) => u.count > 0)) {
+            unlocked = true;
+          }
+          break;
+        case AchievementType.allManagersHired:
+          if (managers.every((m) => m.isHired)) {
+            unlocked = true;
+          }
+          break;
+        case AchievementType.allUpgradesPurchased:
+          if (upgrades.every((u) => u.isPurchased)) {
+            unlocked = true;
+          }
           break;
       }
 
@@ -786,7 +831,9 @@ class GameState extends ChangeNotifier {
       return value.toStringAsExponential(2);
     }
 
-    if (value < 1000) return value.toStringAsFixed(0);
+    if (value < 1000) {
+      return value.toStringAsFixed(0);
+    }
 
     const suffixes = [
       "",
