@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/game_state.dart';
+import 'crazy_dialog.dart';
 
 class GoldenPackageWidget extends StatefulWidget {
   const GoldenPackageWidget({super.key});
@@ -93,44 +94,38 @@ class _GoldenPackageWidgetState extends State<GoldenPackageWidget>
   }
 
   void _showRewardDialog(BuildContext context, String message, String story) {
-    showDialog(
+    showCrazyDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.amber[50],
-        title: const Text(
-          'GOLDEN PACKAGE!',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      title: 'GOLDEN PACKAGE!',
+      themeColor: Colors.amber,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          const Divider(),
+          const SizedBox(height: 16),
+          Text(
+            story,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              fontStyle: FontStyle.italic,
+              color: Colors.grey[800],
             ),
-            const SizedBox(height: 16),
-            const Divider(),
-            const SizedBox(height: 16),
-            Text(
-              story,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                fontStyle: FontStyle.italic,
-                color: Colors.grey[800],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('AWESOME!'),
           ),
         ],
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('AWESOME!'),
+        ),
+      ],
     );
   }
 }

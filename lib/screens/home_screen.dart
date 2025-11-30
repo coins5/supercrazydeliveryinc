@@ -10,6 +10,7 @@ import '../data/offline_messages.dart';
 import 'dart:math';
 import 'prestige_screen.dart';
 import '../widgets/golden_package_widget.dart';
+import '../widgets/crazy_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -160,59 +161,58 @@ class _HomeScreenState extends State<HomeScreen> {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (!mounted) return;
                 gameState.markOfflineEarningsAsShown();
-                showDialog(
+                showCrazyDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Welcome Back!'),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.access_time,
-                          size: 48,
-                          color: Colors.blue,
+                  title: 'Welcome Back!',
+                  themeColor: Colors.blue,
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.access_time,
+                        size: 48,
+                        color: Colors.blue,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        offlineMessages[Random().nextInt(
+                          offlineMessages.length,
+                        )],
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'You were away for ${gameState.formatDuration(gameState.offlineSeconds)}',
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Your delivery empire earned:',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '\$${gameState.formatNumber(gameState.offlineEarnings)}',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          offlineMessages[Random().nextInt(
-                            offlineMessages.length,
-                          )],
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'You were away for ${gameState.formatDuration(gameState.offlineSeconds)}',
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Your delivery empire earned:',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '\$${gameState.formatNumber(gameState.offlineEarnings)}',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
-                          ),
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          gameState.consumeOfflineEarnings();
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('AWESOME!'),
                       ),
                     ],
                   ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        gameState.consumeOfflineEarnings();
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('AWESOME!'),
+                    ),
+                  ],
                 );
               });
             }

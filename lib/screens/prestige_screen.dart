@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/game_state.dart';
+import '../widgets/crazy_dialog.dart';
 
 class PrestigeScreen extends StatelessWidget {
   const PrestigeScreen({super.key});
@@ -154,30 +155,29 @@ class PrestigeScreen extends StatelessWidget {
   }
 
   void _showConfirmationDialog(BuildContext context, GameState gameState) {
-    showDialog(
+    showCrazyDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Are you sure?'),
-        content: const Text(
-          'You are about to reset your progress for Crazy Tokens.\n\n'
-          'This action cannot be undone!',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('CANCEL'),
-          ),
-          TextButton(
-            onPressed: () {
-              gameState.prestige();
-              Navigator.pop(context); // Close dialog
-              Navigator.pop(context); // Close Prestige Screen
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('DO IT!'),
-          ),
-        ],
+      title: 'Are you sure?',
+      themeColor: Colors.redAccent,
+      content: const Text(
+        'You are about to reset your progress for Crazy Tokens.\n\n'
+        'This action cannot be undone!',
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('CANCEL'),
+        ),
+        TextButton(
+          onPressed: () {
+            gameState.prestige();
+            Navigator.pop(context); // Close dialog
+            Navigator.pop(context); // Close Prestige Screen
+          },
+          style: TextButton.styleFrom(foregroundColor: Colors.red),
+          child: const Text('DO IT!'),
+        ),
+      ],
     );
   }
 }

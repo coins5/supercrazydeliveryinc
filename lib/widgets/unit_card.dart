@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/delivery_unit.dart';
 import '../models/game_state.dart';
+import 'crazy_dialog.dart';
 
 class UnitCard extends StatelessWidget {
   final DeliveryUnit unit;
@@ -160,17 +161,17 @@ class UnitCard extends StatelessWidget {
   }
 
   void _showUnitInfo(BuildContext context) {
-    showDialog(
+    showCrazyDialog(
       context: context,
-      builder: (context) {
-        final gameState = Provider.of<GameState>(context, listen: false);
-        final unitUpgrades = gameState.upgrades
-            .where((u) => u.targetUnitId == unit.id)
-            .toList();
+      title: unit.name,
+      content: Builder(
+        builder: (context) {
+          final gameState = Provider.of<GameState>(context, listen: false);
+          final unitUpgrades = gameState.upgrades
+              .where((u) => u.targetUnitId == unit.id)
+              .toList();
 
-        return AlertDialog(
-          title: Text(unit.name),
-          content: SingleChildScrollView(
+          return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -199,15 +200,15 @@ class UnitCard extends StatelessWidget {
                 _buildEvolutionText(1000, "Godlike", unit.count),
               ],
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
+          );
+        },
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Close'),
+        ),
+      ],
     );
   }
 
