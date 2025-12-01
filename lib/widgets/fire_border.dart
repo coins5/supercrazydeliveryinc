@@ -64,10 +64,10 @@ class _FirePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
     // Inner rect for the content (approximate based on padding)
-    final innerRect = rect.deflate(4.0);
-    final rrect = borderRadius.toRRect(innerRect);
+    // final innerRect = rect.deflate(4.0);
+    // final rrect = borderRadius.toRRect(innerRect);
 
-    final paint = Paint()..style = PaintingStyle.fill;
+    // final paint = Paint()..style = PaintingStyle.fill;
 
     // We will draw flames extending OUTWARDS from the rrect.
     // To do this effectively, we can iterate around the perimeter.
@@ -133,7 +133,7 @@ class _FirePainter extends CustomPainter {
     // Let's walk the perimeter of the rounded rect.
     // Top edge
     for (int i = 0; i <= steps; i++) {
-      double t = i / steps;
+      // double t = i / steps;
       // Map t to perimeter position
       // This is complex to get perfect RRect mapping.
       // Let's use a simplified approach: Polar coordinates from center?
