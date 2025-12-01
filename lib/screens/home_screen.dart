@@ -12,6 +12,7 @@ import 'prestige_screen.dart';
 import '../widgets/golden_package_widget.dart';
 import '../widgets/crazy_dialog.dart';
 import '../widgets/fire_border.dart';
+import 'premium_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -408,7 +409,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 context: context,
                                 onPressed: gameState.isPremium
                                     ? null
-                                    : gameState.activatePremium,
+                                    : () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const PremiumScreen(),
+                                          ),
+                                        );
+                                      },
                                 isActive: gameState.isPremium,
                                 activeColor: Colors.amber,
                                 inactiveColor: Colors.amber,

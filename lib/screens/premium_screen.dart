@@ -1,0 +1,190 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../models/game_state.dart';
+
+class PremiumScreen extends StatelessWidget {
+  const PremiumScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF2E004F), // Deep Purple
+              Color(0xFF6A00F4), // Bright Purple
+              Color(0xFFFFD700), // Gold
+            ],
+            stops: [0.0, 0.5, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'VERSIÓN PREMIUM',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 40,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black45,
+                        offset: Offset(4, 4),
+                        blurRadius: 8,
+                      ),
+                      Shadow(
+                        color: Colors.amber,
+                        offset: Offset(0, 0),
+                        blurRadius: 20,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Expanded(
+                  child: Card(
+                    elevation: 16,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                      side: const BorderSide(color: Colors.amber, width: 4),
+                    ),
+                    color: Colors.black.withOpacity(0.6),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            '¡Conviértete en un Patrocinador Legendario! 🚀',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.amberAccent,
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          _buildBenefitRow(
+                            icon: Icons.block,
+                            text: 'Elimina TODOS los anuncios molestos.',
+                          ),
+                          const SizedBox(height: 16),
+                          _buildBenefitRow(
+                            icon: Icons.attach_money,
+                            text: 'DUPLICA tus ganancias permanentemente.',
+                          ),
+                          const SizedBox(height: 16),
+                          _buildBenefitRow(
+                            icon: Icons.favorite,
+                            text:
+                                'Apoyas directamente al desarrollador para más actualizaciones locas.',
+                          ),
+                          const SizedBox(height: 32),
+                          const Text(
+                            '¡Tu apoyo hace la diferencia! 🥳',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontStyle: FontStyle.italic,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                ElevatedButton(
+                  onPressed: () {
+                    final gameState = Provider.of<GameState>(
+                      context,
+                      listen: false,
+                    );
+                    gameState.activatePremium();
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          '¡GRACIAS POR TU APOYO! ERES INCREÍBLE. 💖',
+                        ),
+                        backgroundColor: Colors.amber,
+                        duration: Duration(seconds: 5),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 10,
+                    shadowColor: Colors.amberAccent,
+                  ),
+                  child: const Text(
+                    'COMPRAR AHORA',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBenefitRow({required IconData icon, required String text}) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: Colors.amber, size: 28),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+              height: 1.4,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
