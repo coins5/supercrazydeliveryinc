@@ -1,210 +1,64 @@
 import '../models/upgrade.dart';
+import '../models/delivery_unit.dart';
 
-List<Upgrade> getDefaultUpgrades() {
-  return [
-    Upgrade(
-      id: 'grandma_cookies',
-      name: 'Grandma\'s Cookies',
-      description: 'Grandmas work twice as hard for cookies.',
-      cost: 500,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'grandma',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'drone_battery',
-      name: 'Lithium Batteries',
-      description: 'Drones fly longer.',
-      cost: 5000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'drone',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'pigeon_feed',
-      name: 'Premium Bird Seed',
-      description: 'Pigeons fly faster with full bellies.',
-      cost: 25000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'pigeon_flock',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'pizza_oven',
-      name: 'Nuclear Pizza Ovens',
-      description: 'Pizzas cook instantly.',
-      cost: 50000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'rocket_pizza',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'skateboard_bearings',
-      name: 'Ceramic Bearings',
-      description: 'Less friction, more speed.',
-      cost: 125000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'skateboard_kid',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'clown_shoes',
-      name: 'Aerodynamic Shoes',
-      description: 'Honk honk! Zoom zoom!',
-      cost: 375000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'unicycle_clown',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'catapult_grease',
-      name: 'Slippery Grease',
-      description: 'Packages slide out faster.',
-      cost: 1000000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'catapult',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'cannon_powder',
-      name: 'Explosive Powder',
-      description: 'More boom for your buck.',
-      cost: 2500000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'cannon',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'dog_treats',
-      name: 'Quantum Treats',
-      description: 'Good boy teleports twice as fast.',
-      cost: 7500000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'teleporting_dog',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'ufo_engine',
-      name: 'Anti-Gravity Engine',
-      description: 'Abductions are 200% more efficient.',
-      cost: 25000000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'ufo',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'portal_fluid',
-      name: 'Portal Fluid',
-      description: 'Slippery portals.',
-      cost: 75000000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'portal_gun',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'flux_capacitor',
-      name: 'Flux Capacitor',
-      description: '1.21 Gigawatts!',
-      cost: 250000000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'time_traveler',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'event_horizon',
-      name: 'Expanded Event Horizon',
-      description: 'Nothing escapes delivery.',
-      cost: 1000000000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'black_hole',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'quantum_router',
-      name: 'Quantum Router',
-      description: 'Entanglement bandwidth increased.',
-      cost: 5000000000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'quantum_entanglement',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'warp_core',
-      name: 'Dilithium Crystals',
-      description: 'Maximum warp!',
-      cost: 25000000000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'warp_drive_van',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'hyperspace_lane',
-      name: 'Hyperspace Bypass',
-      description: 'No traffic in the 4th dimension.',
-      cost: 100000000000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'hyperspace_bike',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'wormhole_stabilizer',
-      name: 'Wormhole Stabilizer',
-      description: 'Less spaghettification, more delivery.',
-      cost: 500000000000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'wormhole_express',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'multiverse_map',
-      name: 'Multiverse Map',
-      description: 'Don\'t get lost in the infinite.',
-      cost: 2500000000000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'multiverse_skipper',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'reality_anchor',
-      name: 'Reality Anchor',
-      description: 'Keep the delivery real.',
-      cost: 10000000000000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'reality_bender',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'omni_vision',
-      name: 'Omni-Vision',
-      description: 'He sees all packages.',
-      cost: 50000000000000,
-      type: UpgradeType.unitMultiplier,
-      targetUnitId: 'omnipresent_postman',
-      multiplierValue: 2.0,
-    ),
-    Upgrade(
-      id: 'coffee_break',
-      name: 'Coffee for Everyone',
-      description: 'Global productivity boost!',
-      cost: 100000,
-      type: UpgradeType.globalMultiplier,
-      multiplierValue: 1.2,
-    ),
-    Upgrade(
-      id: 'energy_drink',
-      name: 'Radioactive Energy Drinks',
-      description: 'Everyone runs faster (and glows).',
-      cost: 10000000,
-      type: UpgradeType.globalMultiplier,
-      multiplierValue: 1.5,
-    ),
-    Upgrade(
-      id: 'ai_manager',
-      name: 'AI Manager',
-      description: 'Optimizes everything perfectly.',
-      cost: 1000000000,
-      type: UpgradeType.globalMultiplier,
-      multiplierValue: 2.0,
-    ),
-  ];
+List<Upgrade> getDefaultUpgrades(List<DeliveryUnit> units) {
+  List<Upgrade> upgrades = [];
+
+  // 1. Click Upgrades (20 Tiers)
+  double clickUpgradeCost = 500;
+
+  for (int i = 1; i <= 20; i++) {
+    upgrades.add(
+      Upgrade(
+        id: 'click_upgrade_$i',
+        name: 'Crazy Clicker Tier $i',
+        description: 'Multiplies click value by 2.',
+        cost: clickUpgradeCost,
+        multiplierValue: 2.0,
+        type: UpgradeType.clickMultiplier,
+      ),
+    );
+
+    clickUpgradeCost *= 5; // Expensive!
+  }
+
+  // 2. Unit Upgrades (10 Tiers per Unit)
+  for (var unit in units) {
+    double upgradeCost = unit.baseCost * 10;
+
+    for (int tier = 1; tier <= 10; tier++) {
+      double multiplier = 2.0;
+      String name = "${unit.name} Upgrade $tier";
+      String description = "Doubles income of ${unit.name}.";
+
+      // Special Tiers
+      if (tier == 5) {
+        multiplier = 5.0;
+        description = "Quintuples income of ${unit.name}!";
+      } else if (tier == 10) {
+        multiplier = 100.0; // Crazy Tier 10
+        description = "Multiplies income of ${unit.name} by 100!!!";
+      }
+
+      upgrades.add(
+        Upgrade(
+          id: 'upgrade_${unit.id}_$tier',
+          name: name,
+          description: description,
+          cost: upgradeCost,
+          multiplierValue: multiplier,
+          type: UpgradeType.unitMultiplier,
+          targetUnitId: unit.id,
+        ),
+      );
+
+      // Cost scaling for next tier
+      upgradeCost *= 8;
+    }
+  }
+
+  // Sort by cost
+  upgrades.sort((a, b) => a.cost.compareTo(b.cost));
+
+  return upgrades;
 }

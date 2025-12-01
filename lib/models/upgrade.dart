@@ -5,6 +5,14 @@ class Upgrade {
   final String name;
   final String description;
   final double cost;
+
+  double getCost(bool isHardMode) {
+    if (isHardMode) {
+      return cost * 2.5;
+    }
+    return cost;
+  }
+
   final UpgradeType type;
   final String? targetUnitId; // Only for unitMultiplier
   final double multiplierValue;

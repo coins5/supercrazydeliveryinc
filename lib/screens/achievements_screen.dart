@@ -36,13 +36,44 @@ class AchievementsScreen extends StatelessWidget {
                           : Colors.grey[600],
                     ),
                   ),
-                  subtitle: Text(
-                    achievement.description,
-                    style: TextStyle(
-                      color: achievement.isUnlocked
-                          ? Colors.black87
-                          : Colors.grey[600],
-                    ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        achievement.description,
+                        style: TextStyle(
+                          color: achievement.isUnlocked
+                              ? Colors.black87
+                              : Colors.grey[600],
+                        ),
+                      ),
+                      if (!achievement.isUnlocked) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: LinearProgressIndicator(
+                                value: gameState.getAchievementProgress(
+                                  achievement,
+                                ),
+                                backgroundColor: Colors.grey[400],
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.blue,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${(gameState.getAchievementProgress(achievement) * 100).toInt()}%',
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
                   ),
                   trailing: achievement.isUnlocked
                       ? const Icon(Icons.check_circle, color: Colors.green)
