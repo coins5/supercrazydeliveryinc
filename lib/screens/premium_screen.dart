@@ -68,7 +68,7 @@ class PremiumScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(32),
                       side: const BorderSide(color: Colors.amber, width: 4),
                     ),
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: .6),
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
                       child: Column(
@@ -167,7 +167,7 @@ class PremiumScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: .1),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: Colors.amber, size: 28),
