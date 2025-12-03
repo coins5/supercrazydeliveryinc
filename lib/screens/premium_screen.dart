@@ -121,17 +121,14 @@ class PremiumScreen extends StatelessWidget {
                       context,
                       listen: false,
                     );
-                    gameState.activatePremium();
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'THANK YOU FOR YOUR SUPPORT! YOU ARE AMAZING. 💖',
-                        ),
-                        backgroundColor: Colors.amber,
-                        duration: Duration(seconds: 5),
-                      ),
-                    );
+                    gameState.buyPremium();
+                    // Navigator pop handled by listener or user manually closing?
+                    // Usually we keep it open until purchase succeeds.
+                    // But the original code popped it.
+                    // Let's NOT pop it immediately, so they see the process.
+                    // Or maybe pop it if they want to continue playing while it processes?
+                    // Better to keep it open or show a loading indicator.
+                    // For now, let's just trigger the buy flow.
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber,
@@ -149,6 +146,24 @@ class PremiumScreen extends StatelessWidget {
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
+                    final gameState = Provider.of<GameState>(
+                      context,
+                      listen: false,
+                    );
+                    gameState.restorePurchases();
+                  },
+                  child: const Text(
+                    'Restore Purchases',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                      decoration: TextDecoration.underline,
                     ),
                   ),
                 ),

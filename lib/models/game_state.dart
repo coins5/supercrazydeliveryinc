@@ -15,6 +15,7 @@ import 'managers/prestige_manager.dart';
 
 import '../data/golden_stories.dart';
 import '../services/persistence_service.dart';
+import '../services/purchase_service.dart';
 
 class GameState extends ChangeNotifier {
   final CurrencyManager currencyManager = CurrencyManager();
@@ -25,6 +26,7 @@ class GameState extends ChangeNotifier {
   final PrestigeManager prestigeManager = PrestigeManager();
 
   final PersistenceService _persistenceService = PersistenceService();
+  late final PurchaseService _purchaseService;
 
   Timer? _timer;
   DateTime _lastSaveTime = DateTime.now();
@@ -94,6 +96,16 @@ class GameState extends ChangeNotifier {
   void activatePremium() {
     _isPremium = true;
     notifyListeners();
+    _saveGame(); // Save immediately
+    _toastController.add("Premium Activated! Thank you!");
+  }
+
+  Future<void> buyPremium() async {
+    await _purchaseService.buyPremium();
+  }
+
+  Future<void> restorePurchases() async {
+    await _purchaseService.restorePurchases();
   }
 
   // Difficulty
@@ -185,6 +197,18 @@ class GameState extends ChangeNotifier {
 
     _loadGame();
     _startTimer();
+
+    _purchaseService = PurchaseService(
+      onPremiumStatusChanged: (isPremium) {
+        if (isPremium && !_isPremium) {
+          activatePremium();
+        }
+      },
+      onError: (error) {
+        _toastController.add(error);
+      },
+    );
+    _purchaseService.initialize();
   }
 
   void _startTimer() {
@@ -203,7 +227,9 @@ class GameState extends ChangeNotifier {
     prestigeManager.removeListener(notifyListeners);
     _timer?.cancel();
     _goldenPackageTimer?.cancel();
+    _goldenPackageTimer?.cancel();
     _toastController.close();
+    _purchaseService.dispose();
     super.dispose();
   }
 
