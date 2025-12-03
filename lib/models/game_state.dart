@@ -45,6 +45,9 @@ class GameState extends ChangeNotifier {
   int _totalBoostsActivated = 0;
   int get totalBoostsActivated => _totalBoostsActivated;
 
+  bool _hasUsedFreeBoost = false;
+  bool get hasUsedFreeBoost => _hasUsedFreeBoost;
+
   bool _useScientificNotation = false;
   bool get useScientificNotation => _useScientificNotation;
 
@@ -110,6 +113,10 @@ class GameState extends ChangeNotifier {
     final maxEndTime = now.add(const Duration(hours: 24));
     if (_boostEndTime!.isAfter(maxEndTime)) {
       _boostEndTime = maxEndTime;
+    }
+
+    if (!_hasUsedFreeBoost) {
+      _hasUsedFreeBoost = true;
     }
 
     _totalBoostsActivated++;
@@ -225,8 +232,8 @@ class GameState extends ChangeNotifier {
   }
 
   // Offline Earnings
-  double _offlineEarnings = 0;
-  double get offlineEarnings => _offlineEarnings;
+  double _pendingOfflineEarnings = 0;
+  double get pendingOfflineEarnings => _pendingOfflineEarnings;
 
   int _offlineSeconds = 0;
   int get offlineSeconds => _offlineSeconds;
@@ -239,10 +246,16 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void consumeOfflineEarnings() {
-    _offlineEarnings = 0;
-    _offlineSeconds = 0;
-    notifyListeners();
+  void consumeOfflineEarnings(double multiplier) {
+    if (_pendingOfflineEarnings > 0) {
+      double amount = _pendingOfflineEarnings * multiplier;
+      _money += amount;
+      _totalMoneyEarned += amount;
+      _pendingOfflineEarnings = 0;
+      _offlineSeconds = 0;
+      _checkAchievements();
+      notifyListeners();
+    }
   }
 
   final PersistenceService _persistenceService = PersistenceService();
@@ -271,6 +284,7 @@ class GameState extends ChangeNotifier {
       _clickMultiplier = data['clickMultiplier'] ?? 1.0;
       _isPremium = data['isPremium'] ?? false;
       _prestigeTokens = data['prestigeTokens'] ?? 0;
+      _hasUsedFreeBoost = data['hasUsedFreeBoost'] ?? false;
 
       if (data['boostEndTime'] != null) {
         _boostEndTime = DateTime.tryParse(data['boostEndTime']);
@@ -401,9 +415,10 @@ class GameState extends ChangeNotifier {
               earnings *= 2;
             }
 
-            _offlineEarnings = earnings;
-            _money += _offlineEarnings;
-            _totalMoneyEarned += _offlineEarnings;
+            _pendingOfflineEarnings = earnings;
+            // Do NOT add to money yet. Wait for user action.
+            // _money += _offlineEarnings;
+            // _totalMoneyEarned += _offlineEarnings;
             _hasShownOfflineEarnings = false;
           }
         }
@@ -441,6 +456,7 @@ class GameState extends ChangeNotifier {
       'clickMultiplier': _clickMultiplier,
       'isPremium': _isPremium,
       'prestigeTokens': _prestigeTokens,
+      'hasUsedFreeBoost': _hasUsedFreeBoost,
       'boostEndTime': _boostEndTime?.toIso8601String(),
       'lastSaveTime': DateTime.now().toIso8601String(),
       'units': units
@@ -797,6 +813,36 @@ class GameState extends ChangeNotifier {
         notifyListeners();
       }
     });
+  }
+
+  ({double amount, String message, String story}) calculateGoldenReward() {
+    _goldenPackageActive = false;
+    _totalGoldenPackagesClicked++;
+    _checkAchievements();
+
+    // Reward Logic
+    // 1. Instant Money (10x - 100x current MPS)
+    // 2. Or if MPS is low, a flat amount based on unit costs?
+    // Let's stick to MPS multiplier for scaling.
+    double baseReward = moneyPerSecond * (10 + math.Random().nextInt(90));
+    if (baseReward < 100) baseReward = 100; // Minimum reward
+
+    // Story
+    final story = goldenStories[math.Random().nextInt(goldenStories.length)];
+
+    return (
+      amount: baseReward,
+      message: "You found a Golden Package!",
+      story: story,
+    );
+  }
+
+  void claimGoldenPackageReward(double amount, double multiplier) {
+    double finalAmount = amount * multiplier;
+    _money += finalAmount;
+    _totalMoneyEarned += finalAmount;
+    _checkAchievements();
+    notifyListeners();
   }
 
   ({String message, String story}) clickGoldenPackage() {

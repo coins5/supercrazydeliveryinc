@@ -13,6 +13,7 @@ import '../widgets/golden_package_widget.dart';
 import '../widgets/crazy_dialog.dart';
 import '../widgets/fire_border.dart';
 import 'premium_screen.dart';
+import '../services/ad_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -158,11 +159,16 @@ class _HomeScreenState extends State<HomeScreen> {
             }
 
             // Check for Offline Earnings
-            if (gameState.offlineEarnings > 0 &&
+            if (gameState.pendingOfflineEarnings > 0 &&
                 !gameState.hasShownOfflineEarnings) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (!mounted) return;
                 gameState.markOfflineEarningsAsShown();
+
+                // Determine multipliers based on Premium status
+                // Premium: x8 (Automatic/Claim)
+                // Normal: x1 (Claim) or x4 (Watch Ad)
+
                 showCrazyDialog(
                   context: context,
                   barrierDismissible: false,
@@ -197,23 +203,83 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '\$${gameState.formatNumber(gameState.offlineEarnings)}',
+                        '\$${gameState.formatNumber(gameState.pendingOfflineEarnings)}',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.green,
                         ),
                       ),
+                      if (gameState.isPremium) ...[
+                        const SizedBox(height: 16),
+                        const Text(
+                          "PREMIUM BONUS APPLIED: x8!",
+                          style: TextStyle(
+                            color: Colors.amber,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                   actions: [
-                    TextButton(
-                      onPressed: () {
-                        gameState.consumeOfflineEarnings();
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('AWESOME!'),
-                    ),
+                    if (gameState.isPremium)
+                      TextButton(
+                        onPressed: () {
+                          // Premium gets x8 total (x2 base premium * x4 bonus logic? Or just flat x8?)
+                          // Requirement: "Si es premium, entonces obtiene recompensas por 8 sin tener que mirar nada"
+                          // The base calculation in GameState ALREADY includes x2 for Premium if active.
+                          // So pendingOfflineEarnings is (Base * 2).
+                          // To get x8 total relative to non-premium base, we need another x4.
+                          // Wait, let's look at GameState logic again.
+                          // GameState: earnings *= 2 if premium.
+                          // So pending is 2x Base.
+                          // To get 8x Base, we need pending * 4.
+                          gameState.consumeOfflineEarnings(4.0);
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('CLAIM x8 (PREMIUM)'),
+                      )
+                    else ...[
+                      TextButton(
+                        onPressed: () {
+                          // Normal claim x1
+                          gameState.consumeOfflineEarnings(1.0);
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('CLAIM x1'),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close initial dialog
+                          AdService.instance.showRewardedAd(
+                            onUserEarnedReward: () {
+                              // Watch Ad x4
+                              // Pending is 1x Base.
+                              // We want 4x Base.
+                              gameState.consumeOfflineEarnings(4.0);
+                            },
+                            onAdFailedToShow: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Ad not ready yet. Please try again in a moment.",
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        icon: const Icon(Icons.play_arrow),
+                        label: const Text('WATCH AD (x4)'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
                   ],
                 );
               });
@@ -370,83 +436,133 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
 
                     // Control Panel
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _buildControlButton(
-                              context: context,
-                              onPressed:
-                                  (gameState.isBoostActive &&
-                                      gameState.boostRemainingTime.inMinutes >=
-                                          (23 * 60 + 30))
-                                  ? null
-                                  : gameState.activateBoost,
-                              isActive: gameState.isBoostActive,
-                              activeColor: Colors.green,
-                              inactiveColor: Colors.redAccent,
-                              label: gameState.isBoostActive
-                                  ? "BOOST ACTIVE"
-                                  : "BOOST x2",
-                              subLabel: gameState.isBoostActive
-                                  ? (gameState.boostRemainingTime.inMinutes >=
-                                            (23 * 60 + 30)
-                                        ? "MAX (24h)"
-                                        : gameState.boostRemainingTime
-                                              .toString()
-                                              .split('.')
-                                              .first)
-                                  : "4h",
-                              icon: Icons.rocket_launch,
-                            ),
-                            const SizedBox(width: 8),
-                            FireBorder(
-                              isActive: gameState.isPremium,
-                              child: _buildControlButton(
-                                context: context,
-                                onPressed: gameState.isPremium
-                                    ? null
-                                    : () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const PremiumScreen(),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildControlButton(
+                            context: context,
+                            onPressed:
+                                (gameState.isBoostActive &&
+                                    gameState.boostRemainingTime.inMinutes >=
+                                        (23 * 60 + 30))
+                                ? null
+                                : () {
+                                    if (gameState.isPremium ||
+                                        !gameState.hasUsedFreeBoost) {
+                                      gameState.activateBoost();
+                                    } else {
+                                      // Show Ad Dialog
+                                      showCrazyDialog(
+                                        context: context,
+                                        title: "BOOST PRODUCTION!",
+                                        content: const Text(
+                                          "Watch an ad to double your production for 4 hours?",
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text("CANCEL"),
                                           ),
-                                        );
-                                      },
-                                isActive: gameState.isPremium,
-                                activeColor: Colors.amber,
-                                inactiveColor: Colors.amber,
-                                label: "PREMIUM",
-                                subLabel: gameState.isPremium
-                                    ? "FOREVER"
-                                    : "x2 PERM",
-                                icon: Icons.star,
-                                isPremium: true,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            _buildControlButton(
+                                          ElevatedButton.icon(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              AdService.instance.showRewardedAd(
+                                                onUserEarnedReward: () {
+                                                  gameState.activateBoost();
+                                                },
+                                                onAdFailedToShow: () {
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        "Ad not ready yet. Please try again in a moment.",
+                                                      ),
+                                                      backgroundColor:
+                                                          Colors.red,
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            icon: const Icon(Icons.play_arrow),
+                                            label: const Text("WATCH AD"),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.green,
+                                              foregroundColor: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }
+                                  },
+                            isActive: gameState.isBoostActive,
+                            activeColor: Colors.green,
+                            inactiveColor: Colors.redAccent,
+                            label: gameState.isBoostActive
+                                ? "BOOST ACTIVE"
+                                : "BOOST x2",
+                            subLabel: gameState.isBoostActive
+                                ? (gameState.boostRemainingTime.inMinutes >=
+                                          (23 * 60 + 30)
+                                      ? "MAX (24h)"
+                                      : gameState.boostRemainingTime
+                                            .toString()
+                                            .split('.')
+                                            .first)
+                                : (gameState.isPremium
+                                      ? "FREE (PREMIUM)"
+                                      : (!gameState.hasUsedFreeBoost
+                                            ? "FREE"
+                                            : "WATCH AD")),
+                            icon: Icons.rocket_launch,
+                          ),
+                          const SizedBox(width: 8),
+                          FireBorder(
+                            isActive: gameState.isPremium,
+                            child: _buildControlButton(
                               context: context,
-                              onPressed: gameState.toggleBuyMultiplier,
-                              isActive: true, // Always active
-                              activeColor: Colors.blue,
-                              inactiveColor: Colors.blue,
-                              label:
-                                  "BUY x${gameState.buyMultiplier == -1 ? 'MAX' : gameState.buyMultiplier}",
-                              subLabel: "MULTIPLIER",
-                              icon: Icons.shopping_cart,
+                              onPressed: gameState.isPremium
+                                  ? null
+                                  : () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const PremiumScreen(),
+                                        ),
+                                      );
+                                    },
+                              isActive: gameState.isPremium,
+                              activeColor: Colors.amber,
+                              inactiveColor: Colors.amber,
+                              label: "PREMIUM",
+                              subLabel: gameState.isPremium
+                                  ? "FOREVER"
+                                  : "x2 PERM",
+                              icon: Icons.star,
+                              isPremium: true,
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildControlButton(
+                            context: context,
+                            onPressed: gameState.toggleBuyMultiplier,
+                            isActive: true, // Always active
+                            activeColor: Colors.blue,
+                            inactiveColor: Colors.blue,
+                            label:
+                                "BUY x${gameState.buyMultiplier == -1 ? 'MAX' : gameState.buyMultiplier}",
+                            subLabel: "MULTIPLIER",
+                            icon: Icons.shopping_cart,
+                          ),
+                        ],
                       ),
                     ),
-
-                    // List
                     Expanded(
                       child: _selectedIndex == 0
                           ? (visibleUnits.isEmpty
