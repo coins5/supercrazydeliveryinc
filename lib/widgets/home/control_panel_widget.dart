@@ -45,10 +45,10 @@ class ControlPanelWidget extends StatelessWidget {
                               ),
                               ElevatedButton.icon(
                                 onPressed: () {
-                                  Navigator.pop(context);
                                   AdService.instance.showRewardedAd(
                                     onUserEarnedReward: () {
                                       gameState.activateBoost();
+                                      Navigator.pop(context);
                                     },
                                     onAdFailedToShow: () {
                                       ScaffoldMessenger.of(

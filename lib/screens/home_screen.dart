@@ -321,10 +321,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       ElevatedButton.icon(
                         onPressed: () {
-                          Navigator.of(context).pop();
                           AdService.instance.showRewardedAd(
                             onUserEarnedReward: () {
                               gameState.consumeOfflineEarnings(4.0);
+                              Navigator.of(context).pop();
                             },
                             onAdFailedToShow: () {
                               ScaffoldMessenger.of(context).showSnackBar(

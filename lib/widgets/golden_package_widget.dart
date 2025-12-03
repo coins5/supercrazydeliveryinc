@@ -159,11 +159,11 @@ class _GoldenPackageWidgetState extends State<GoldenPackageWidget>
           ),
           ElevatedButton.icon(
             onPressed: () {
-              Navigator.pop(context);
               AdService.instance.showRewardedAd(
                 onUserEarnedReward: () {
                   // Ad x5
                   gameState.claimGoldenPackageReward(baseAmount, 5.0);
+                  Navigator.pop(context);
                 },
                 onAdFailedToShow: () {
                   ScaffoldMessenger.of(context).showSnackBar(
