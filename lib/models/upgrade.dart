@@ -28,4 +28,26 @@ class Upgrade {
     this.targetUnitId,
     this.isPurchased = false,
   });
+
+  Upgrade copyWith({
+    String? id,
+    String? name,
+    String? description,
+    double? cost,
+    UpgradeType? type,
+    double? multiplierValue,
+    String? targetUnitId,
+    bool? isPurchased,
+  }) {
+    return Upgrade(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      cost: cost ?? this.cost,
+      type: type ?? this.type,
+      multiplierValue: multiplierValue ?? this.multiplierValue,
+      targetUnitId: targetUnitId ?? this.targetUnitId,
+      isPurchased: isPurchased ?? this.isPurchased,
+    );
+  }
 }

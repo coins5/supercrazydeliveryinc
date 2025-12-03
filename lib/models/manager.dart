@@ -33,6 +33,28 @@ class Manager {
     this.isHired = false,
   });
 
+  Manager copyWith({
+    String? id,
+    String? name,
+    String? description,
+    double? cost,
+    ManagerType? type,
+    double? value,
+    String? targetUnitId,
+    bool? isHired,
+  }) {
+    return Manager(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      cost: cost ?? this.cost,
+      type: type ?? this.type,
+      value: value ?? this.value,
+      targetUnitId: targetUnitId ?? this.targetUnitId,
+      isHired: isHired ?? this.isHired,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {'id': id, 'isHired': isHired};
   }
