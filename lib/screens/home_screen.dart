@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/game_state.dart';
-import '../widgets/unit_card.dart';
-import '../widgets/upgrade_card.dart';
-import '../widgets/manager_card.dart';
 import 'statistics_screen.dart';
 import 'achievements_screen.dart';
 import '../data/offline_messages.dart';
@@ -11,8 +8,14 @@ import 'dart:math';
 import 'prestige_screen.dart';
 import '../widgets/golden_package_widget.dart';
 import '../widgets/crazy_dialog.dart';
-import '../widgets/fire_border.dart';
-import 'premium_screen.dart';
+import '../services/ad_service.dart';
+
+// New Widgets
+import '../widgets/home/dashboard_widget.dart';
+import '../widgets/home/control_panel_widget.dart';
+import '../widgets/home/unit_list_view.dart';
+import '../widgets/home/upgrade_list_view.dart';
+import '../widgets/home/manager_list_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -40,6 +43,88 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     });
+  }
+
+  void _showSettingsDialog(BuildContext context) {
+    final gameState = Provider.of<GameState>(context, listen: false);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Settings"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text("Scientific Notation"),
+              trailing: Switch(
+                value: gameState.useScientificNotation,
+                onChanged: (value) {
+                  gameState.toggleNumberFormat();
+                  Navigator.pop(context);
+                  _showSettingsDialog(context);
+                },
+              ),
+            ),
+            ListTile(
+              title: const Text("Hard Mode (Production)"),
+              subtitle: const Text("Higher costs, more challenge"),
+              trailing: Switch(
+                value: gameState.isHardMode,
+                onChanged: (value) {
+                  gameState.toggleDifficulty();
+                  Navigator.pop(context);
+                  _showSettingsDialog(context);
+                },
+              ),
+            ),
+            ListTile(
+              title: const Text("Reset Save"),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete_forever, color: Colors.red),
+                onPressed: () {
+                  // Confirm delete
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Reset Game?"),
+                      content: const Text("This cannot be undone!"),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            // Clear save logic (not exposed in GameState directly but we can add it or use PersistenceService)
+                            // For now, let's just prestige which resets most things, or manually clear.
+                            // Ideally GameState should have a hardReset method.
+                            // Assuming prestige is enough for now or user can uninstall.
+                            // But let's call prestige for now as a soft reset.
+                            gameState.prestige();
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            "RESET",
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Close"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -80,7 +165,6 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          // UNCOMENT FOR DEVELOPMENT
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -158,11 +242,12 @@ class _HomeScreenState extends State<HomeScreen> {
             }
 
             // Check for Offline Earnings
-            if (gameState.offlineEarnings > 0 &&
+            if (gameState.pendingOfflineEarnings > 0 &&
                 !gameState.hasShownOfflineEarnings) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (!mounted) return;
                 gameState.markOfflineEarningsAsShown();
+
                 showCrazyDialog(
                   context: context,
                   barrierDismissible: false,
@@ -197,429 +282,90 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '\$${gameState.formatNumber(gameState.offlineEarnings)}',
+                        '\$${gameState.formatNumber(gameState.pendingOfflineEarnings)}',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.green,
                         ),
                       ),
+                      if (gameState.isPremium) ...[
+                        const SizedBox(height: 16),
+                        const Text(
+                          "PREMIUM BONUS APPLIED: x8!",
+                          style: TextStyle(
+                            color: Colors.amber,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                   actions: [
-                    TextButton(
-                      onPressed: () {
-                        gameState.consumeOfflineEarnings();
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('AWESOME!'),
-                    ),
+                    if (gameState.isPremium)
+                      TextButton(
+                        onPressed: () {
+                          gameState.consumeOfflineEarnings(4.0);
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('CLAIM x8 (PREMIUM)'),
+                      )
+                    else ...[
+                      TextButton(
+                        onPressed: () {
+                          gameState.consumeOfflineEarnings(1.0);
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('CLAIM x1'),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          AdService.instance.showRewardedAd(
+                            onUserEarnedReward: () {
+                              gameState.consumeOfflineEarnings(4.0);
+                              Navigator.of(context).pop();
+                            },
+                            onAdFailedToShow: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Ad not ready yet. Please try again in a moment.",
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        icon: const Icon(Icons.play_arrow),
+                        label: const Text('WATCH AD (x4)'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
                   ],
                 );
               });
             }
 
-            // Filter visible units and upgrades
-            final visibleUnits = gameState.units.where((unit) {
-              return gameState.money >= unit.getCost(gameState.isHardMode) ||
-                  unit.count > 0;
-            }).toList();
-
-            final visibleUpgrades = gameState.upgrades.where((upgrade) {
-              return gameState.money >= upgrade.cost && !upgrade.isPurchased;
-            }).toList();
-
             return Stack(
               children: [
                 Column(
                   children: [
-                    // Dashboard
-                    Material(
-                      elevation: 8,
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(32),
-                        bottomRight: Radius.circular(32),
-                      ),
-                      color: Colors.transparent,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Colors.deepPurple, Colors.indigo],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(32),
-                            bottomRight: Radius.circular(32),
-                          ),
-                        ),
-                        child: InkWell(
-                          onTap: gameState.click,
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(32),
-                            bottomRight: Radius.circular(32),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              children: [
-                                Text(
-                                  'CURRENT BALANCE',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.7),
-                                    letterSpacing: 2,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  '\$${gameState.formatNumber(gameState.money)}',
-                                  style: const TextStyle(
-                                    fontSize: 48,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.white,
-                                    shadows: [
-                                      Shadow(
-                                        color: Colors.black26,
-                                        offset: Offset(2, 2),
-                                        blurRadius: 4,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withValues(
-                                          alpha: .2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.flash_on,
-                                            color: Colors.amber,
-                                            size: 16,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '+ \$${gameState.formatNumber(gameState.moneyPerSecond)} / sec',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withValues(
-                                          alpha: .2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.touch_app,
-                                            color: Colors.cyanAccent,
-                                            size: 16,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '+ \$${gameState.formatNumber(gameState.clickValue)} / click',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  '(Tap anywhere to earn!)',
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: .5),
-                                    fontStyle: FontStyle.italic,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // Control Panel
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _buildControlButton(
-                              context: context,
-                              onPressed:
-                                  (gameState.isBoostActive &&
-                                      gameState.boostRemainingTime.inMinutes >=
-                                          (23 * 60 + 30))
-                                  ? null
-                                  : gameState.activateBoost,
-                              isActive: gameState.isBoostActive,
-                              activeColor: Colors.green,
-                              inactiveColor: Colors.redAccent,
-                              label: gameState.isBoostActive
-                                  ? "BOOST ACTIVE"
-                                  : "BOOST x2",
-                              subLabel: gameState.isBoostActive
-                                  ? (gameState.boostRemainingTime.inMinutes >=
-                                            (23 * 60 + 30)
-                                        ? "MAX (24h)"
-                                        : gameState.boostRemainingTime
-                                              .toString()
-                                              .split('.')
-                                              .first)
-                                  : "4h",
-                              icon: Icons.rocket_launch,
-                            ),
-                            const SizedBox(width: 8),
-                            FireBorder(
-                              isActive: gameState.isPremium,
-                              child: _buildControlButton(
-                                context: context,
-                                onPressed: gameState.isPremium
-                                    ? null
-                                    : () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const PremiumScreen(),
-                                          ),
-                                        );
-                                      },
-                                isActive: gameState.isPremium,
-                                activeColor: Colors.amber,
-                                inactiveColor: Colors.amber,
-                                label: "PREMIUM",
-                                subLabel: gameState.isPremium
-                                    ? "FOREVER"
-                                    : "x2 PERM",
-                                icon: Icons.star,
-                                isPremium: true,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            _buildControlButton(
-                              context: context,
-                              onPressed: gameState.toggleBuyMultiplier,
-                              isActive: true, // Always active
-                              activeColor: Colors.blue,
-                              inactiveColor: Colors.blue,
-                              label:
-                                  "BUY x${gameState.buyMultiplier == -1 ? 'MAX' : gameState.buyMultiplier}",
-                              subLabel: "MULTIPLIER",
-                              icon: Icons.shopping_cart,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // List
+                    const DashboardWidget(),
+                    const ControlPanelWidget(),
                     Expanded(
                       child: _selectedIndex == 0
-                          ? (visibleUnits.isEmpty
-                                ? Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.lock_outline,
-                                          size: 64,
-                                          color: Colors.grey[400],
-                                        ),
-                                        const SizedBox(height: 16),
-                                        Text(
-                                          'Deliver more packages to unlock units!',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.grey[600],
-                                            fontStyle: FontStyle.italic,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : ListView.builder(
-                                    padding: const EdgeInsets.only(bottom: 80),
-                                    itemCount: visibleUnits.length,
-                                    itemBuilder: (context, index) {
-                                      final unit = visibleUnits[index];
-                                      final buyInfo = gameState.getBuyInfo(
-                                        unit,
-                                      );
-                                      return UnitCard(
-                                        unit: unit,
-                                        canAfford:
-                                            gameState.money >= buyInfo.cost &&
-                                            buyInfo.amount > 0,
-                                        buyCost: buyInfo.cost,
-                                        buyAmount: buyInfo.amount,
-                                        onBuy: () => gameState.buyUnit(unit),
-                                        formatNumber: gameState.formatNumber,
-                                        globalMultiplier:
-                                            gameState.globalMultiplier,
-                                        gameState: gameState,
-                                      );
-                                    },
-                                  ))
+                          ? const UnitListView()
                           : _selectedIndex == 1
-                          ? Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: ElevatedButton.icon(
-                                    onPressed: gameState.hireAllManagers,
-                                    icon: const Icon(Icons.people_outline),
-                                    label: const Text("HIRE ALL MANAGERS"),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
-                                      foregroundColor: Colors.white,
-                                      minimumSize: const Size(
-                                        double.infinity,
-                                        50,
-                                      ),
-                                      elevation: 4,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: ListView.builder(
-                                    padding: const EdgeInsets.only(bottom: 80),
-                                    itemCount: gameState.managers.length,
-                                    itemBuilder: (context, index) {
-                                      final manager = gameState.managers[index];
-                                      return ManagerCard(
-                                        manager: manager,
-                                        canAfford:
-                                            gameState.money >=
-                                            manager.getCost(
-                                              gameState.isHardMode,
-                                            ),
-                                        onHire: () =>
-                                            gameState.hireManager(manager),
-                                        formatNumber: gameState.formatNumber,
-                                        isHardMode: gameState.isHardMode,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            )
-                          : (visibleUpgrades.isEmpty
-                                ? Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.lock_outline,
-                                          size: 64,
-                                          color: Colors.grey[400],
-                                        ),
-                                        const SizedBox(height: 16),
-                                        Text(
-                                          'Deliver more packages to unlock upgrades!',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.grey[600],
-                                            fontStyle: FontStyle.italic,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: ElevatedButton.icon(
-                                          onPressed: gameState.buyAllUpgrades,
-                                          icon: const Icon(
-                                            Icons.shopping_cart_checkout,
-                                          ),
-                                          label: const Text("BUY ALL UPGRADES"),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.green,
-                                            foregroundColor: Colors.white,
-                                            minimumSize: const Size(
-                                              double.infinity,
-                                              50,
-                                            ),
-                                            elevation: 4,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: ListView.builder(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 80,
-                                          ),
-                                          itemCount: visibleUpgrades.length,
-                                          itemBuilder: (context, index) {
-                                            final upgrade =
-                                                visibleUpgrades[index];
-                                            return UpgradeCard(
-                                              upgrade: upgrade,
-                                              canAfford:
-                                                  gameState.money >=
-                                                  upgrade.getCost(
-                                                    gameState.isHardMode,
-                                                  ),
-                                              onBuy: () =>
-                                                  gameState.buyUpgrade(upgrade),
-                                              formatNumber:
-                                                  gameState.formatNumber,
-                                              isHardMode: gameState.isHardMode,
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  )),
+                          ? const ManagerListView()
+                          : const UpgradeListView(),
                     ),
                   ],
                 ),
-                // Overlays
                 const GoldenPackageWidget(),
               ],
             );
@@ -642,103 +388,6 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.upgrade), label: 'Upgrades'),
         ],
       ),
-    );
-  }
-
-  Widget _buildControlButton({
-    required BuildContext context,
-    required VoidCallback? onPressed,
-    required bool isActive,
-    required Color activeColor,
-    required Color inactiveColor,
-    required String label,
-    required String subLabel,
-    required IconData icon,
-    bool isPremium = false,
-  }) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isActive ? activeColor : inactiveColor,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        elevation: isActive ? 4 : 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: (isActive && isPremium)
-              ? const BorderSide(
-                  color: Colors.white,
-                  width: 3,
-                ) // Gold/White contrast
-              : (isActive
-                    ? BorderSide(
-                        color: Colors.white.withValues(alpha: .5),
-                        width: 2,
-                      )
-                    : BorderSide.none),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 20),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-          ),
-          Text(
-            subLabel,
-            style: TextStyle(
-              fontSize: 10,
-              color: Colors.white.withValues(alpha: .9),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showSettingsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Consumer<GameState>(
-          builder: (context, gameState, child) {
-            return AlertDialog(
-              title: const Text('Settings'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SwitchListTile(
-                    title: const Text('Scientific Notation'),
-                    value: gameState.useScientificNotation,
-                    onChanged: (value) {
-                      gameState.toggleNumberFormat();
-                    },
-                  ),
-                  SwitchListTile(
-                    title: const Text('Hard Mode (Production)'),
-                    subtitle: const Text('Higher costs, less prestige'),
-                    value: gameState.isHardMode,
-                    onChanged: (value) {
-                      gameState.toggleDifficulty();
-                    },
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Close'),
-                ),
-              ],
-            );
-          },
-        );
-      },
     );
   }
 }

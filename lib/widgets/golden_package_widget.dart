@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/game_state.dart';
-import 'crazy_dialog.dart';
+import '../widgets/crazy_dialog.dart';
+import '../services/ad_service.dart';
 
 class GoldenPackageWidget extends StatefulWidget {
   const GoldenPackageWidget({super.key});
@@ -50,8 +51,14 @@ class _GoldenPackageWidgetState extends State<GoldenPackageWidget>
           alignment: Alignment(alignX, alignY),
           child: GestureDetector(
             onTap: () {
-              final result = gameState.clickGoldenPackage();
-              _showRewardDialog(context, result.message, result.story);
+              final result = gameState.calculateGoldenReward();
+              _showRewardDialog(
+                context,
+                gameState,
+                result.amount,
+                result.message,
+                result.story,
+              );
             },
             child: AnimatedBuilder(
               animation: _scaleAnimation,
@@ -93,7 +100,13 @@ class _GoldenPackageWidgetState extends State<GoldenPackageWidget>
     );
   }
 
-  void _showRewardDialog(BuildContext context, String message, String story) {
+  void _showRewardDialog(
+    BuildContext context,
+    GameState gameState,
+    double baseAmount,
+    String message,
+    String story,
+  ) {
     showCrazyDialog(
       context: context,
       title: 'GOLDEN PACKAGE!',
@@ -118,13 +131,60 @@ class _GoldenPackageWidgetState extends State<GoldenPackageWidget>
               color: Colors.grey[800],
             ),
           ),
+          const SizedBox(height: 24),
+          Text(
+            "Base Reward: \$${gameState.formatNumber(baseAmount)}",
+            style: TextStyle(color: Colors.grey[600]),
+          ),
         ],
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('AWESOME!'),
-        ),
+        if (gameState.isPremium)
+          TextButton(
+            onPressed: () {
+              // Premium x10
+              gameState.claimGoldenPackageReward(baseAmount, 10.0);
+              Navigator.pop(context);
+            },
+            child: const Text('CLAIM x10 (PREMIUM)'),
+          )
+        else ...[
+          TextButton(
+            onPressed: () {
+              // Normal x1
+              gameState.claimGoldenPackageReward(baseAmount, 1.0);
+              Navigator.pop(context);
+            },
+            child: const Text('CLAIM x1'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              AdService.instance.showRewardedAd(
+                onUserEarnedReward: () {
+                  // Ad x5
+                  gameState.claimGoldenPackageReward(baseAmount, 5.0);
+                  Navigator.pop(context);
+                },
+                onAdFailedToShow: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        "Ad not ready yet. Please try again in a moment.",
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                },
+              );
+            },
+            icon: const Icon(Icons.play_arrow),
+            label: const Text('WATCH AD (x5)'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber[800],
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ],
       ],
     );
   }

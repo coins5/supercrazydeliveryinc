@@ -48,4 +48,26 @@ class DeliveryUnit {
   double get totalIncome {
     return baseIncome * count * multiplier * evolutionMultiplier;
   }
+
+  DeliveryUnit copyWith({
+    String? id,
+    String? name,
+    String? description,
+    double? baseCost,
+    double? baseIncome,
+    int? count,
+    double? multiplier,
+    int? evolutionStage,
+  }) {
+    return DeliveryUnit(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      baseCost: baseCost ?? this.baseCost,
+      baseIncome: baseIncome ?? this.baseIncome,
+      count: count ?? this.count,
+      multiplier: multiplier ?? this.multiplier,
+      evolutionStage: evolutionStage ?? this.evolutionStage,
+    );
+  }
 }

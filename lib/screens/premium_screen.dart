@@ -40,7 +40,7 @@ class PremiumScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  'VERSIÓN PREMIUM',
+                  'BECOME PREMIUM!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 40,
@@ -75,7 +75,7 @@ class PremiumScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
-                            '¡Conviértete en un Patrocinador Legendario! 🚀',
+                            'Become a Legendary Sponsor! 🚀',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 24,
@@ -86,22 +86,22 @@ class PremiumScreen extends StatelessWidget {
                           const SizedBox(height: 32),
                           _buildBenefitRow(
                             icon: Icons.block,
-                            text: 'Elimina TODOS los anuncios molestos.',
+                            text: 'Remove ALL annoying ads.',
                           ),
                           const SizedBox(height: 16),
                           _buildBenefitRow(
                             icon: Icons.attach_money,
-                            text: 'DUPLICA tus ganancias permanentemente.',
+                            text: 'DOUBLE your profits permanently.',
                           ),
                           const SizedBox(height: 16),
                           _buildBenefitRow(
                             icon: Icons.favorite,
                             text:
-                                'Apoyas directamente al desarrollador para más actualizaciones locas.',
+                                'Support the developer for more crazy updates.',
                           ),
                           const SizedBox(height: 32),
                           const Text(
-                            '¡Tu apoyo hace la diferencia! 🥳',
+                            'Your support makes a difference! 🥳',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 18,
@@ -121,17 +121,14 @@ class PremiumScreen extends StatelessWidget {
                       context,
                       listen: false,
                     );
-                    gameState.activatePremium();
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          '¡GRACIAS POR TU APOYO! ERES INCREÍBLE. 💖',
-                        ),
-                        backgroundColor: Colors.amber,
-                        duration: Duration(seconds: 5),
-                      ),
-                    );
+                    gameState.buyPremium();
+                    // Navigator pop handled by listener or user manually closing?
+                    // Usually we keep it open until purchase succeeds.
+                    // But the original code popped it.
+                    // Let's NOT pop it immediately, so they see the process.
+                    // Or maybe pop it if they want to continue playing while it processes?
+                    // Better to keep it open or show a loading indicator.
+                    // For now, let's just trigger the buy flow.
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber,
@@ -144,11 +141,29 @@ class PremiumScreen extends StatelessWidget {
                     shadowColor: Colors.amberAccent,
                   ),
                   child: const Text(
-                    'COMPRAR AHORA',
+                    'BUY NOW',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
+                    final gameState = Provider.of<GameState>(
+                      context,
+                      listen: false,
+                    );
+                    gameState.restorePurchases();
+                  },
+                  child: const Text(
+                    'Restore Purchases',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                      decoration: TextDecoration.underline,
                     ),
                   ),
                 ),
