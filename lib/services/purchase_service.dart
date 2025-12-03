@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:flutter/foundation.dart';
 
 class PurchaseService {
   final InAppPurchase _iap = InAppPurchase.instance;
