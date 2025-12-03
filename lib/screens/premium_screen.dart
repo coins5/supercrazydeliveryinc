@@ -40,7 +40,7 @@ class PremiumScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  'VERSIÓN PREMIUM',
+                  'BECOME PREMIUM!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 40,
@@ -75,7 +75,7 @@ class PremiumScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
-                            '¡Conviértete en un Patrocinador Legendario! 🚀',
+                            'Become a Legendary Sponsor! 🚀',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 24,
@@ -86,22 +86,22 @@ class PremiumScreen extends StatelessWidget {
                           const SizedBox(height: 32),
                           _buildBenefitRow(
                             icon: Icons.block,
-                            text: 'Elimina TODOS los anuncios molestos.',
+                            text: 'Remove ALL annoying ads.',
                           ),
                           const SizedBox(height: 16),
                           _buildBenefitRow(
                             icon: Icons.attach_money,
-                            text: 'DUPLICA tus ganancias permanentemente.',
+                            text: 'DOUBLE your profits permanently.',
                           ),
                           const SizedBox(height: 16),
                           _buildBenefitRow(
                             icon: Icons.favorite,
                             text:
-                                'Apoyas directamente al desarrollador para más actualizaciones locas.',
+                                'Support the developer for more crazy updates.',
                           ),
                           const SizedBox(height: 32),
                           const Text(
-                            '¡Tu apoyo hace la diferencia! 🥳',
+                            'Your support makes a difference! 🥳',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 18,
@@ -126,7 +126,7 @@ class PremiumScreen extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text(
-                          '¡GRACIAS POR TU APOYO! ERES INCREÍBLE. 💖',
+                          'THANK YOU FOR YOUR SUPPORT! YOU ARE AMAZING. 💖',
                         ),
                         backgroundColor: Colors.amber,
                         duration: Duration(seconds: 5),
@@ -144,7 +144,7 @@ class PremiumScreen extends StatelessWidget {
                     shadowColor: Colors.amberAccent,
                   ),
                   child: const Text(
-                    'COMPRAR AHORA',
+                    'BUY NOW',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
