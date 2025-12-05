@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+// import 'package:flutter/foundation.dart';
+// import 'package:in_app_purchase_android/in_app_purchase_android.dart';
+// import 'package:in_app_purchase/in_app_purchase.dart';
 import 'models/game_state.dart';
 import 'screens/home_screen.dart';
 import 'services/ad_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Required for Android
+  // if (defaultTargetPlatform == TargetPlatform.android) {
+  //   final InAppPurchaseAndroidPlatformAddition androidAddition = InAppPurchase
+  //       .instance
+  //       .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+  //   await androidAddition.enablePendingPurchases();
+  // }
+
   await AdService.instance.initialize();
   runApp(
     ChangeNotifierProvider(

@@ -28,16 +28,29 @@ class PurchaseService {
   }
 
   Future<void> buyPremium() async {
+    print("Starting buyPremium");
     final bool available = await _iap.isAvailable();
+    print("Store available: $available");
     if (!available) {
       onError("Store not available");
       return;
     }
 
     const Set<String> kIds = {'premium'};
-    final ProductDetailsResponse response = await _iap.queryProductDetails(
-      kIds,
-    );
+    print("Querying product details for $kIds");
+    ProductDetailsResponse response;
+    try {
+      response = await _iap
+          .queryProductDetails(kIds)
+          .timeout(const Duration(seconds: 5));
+    } catch (e) {
+      print("Query timed out or failed: $e");
+      onError("Store connection timed out. Please check your internet.");
+      return;
+    }
+
+    print("AAA - Query response received");
+
     if (response.notFoundIDs.isNotEmpty) {
       onError("Product not found: ${response.notFoundIDs}");
       return;
