@@ -2,8 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/game_state.dart';
 
-class PremiumScreen extends StatelessWidget {
+class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
+
+  @override
+  State<PremiumScreen> createState() => _PremiumScreenState();
+}
+
+class _PremiumScreenState extends State<PremiumScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Listen for toast notifications (errors)
+    final gameState = Provider.of<GameState>(context, listen: false);
+    gameState.toastStream.listen((message) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,13 +145,6 @@ class PremiumScreen extends StatelessWidget {
                       listen: false,
                     );
                     gameState.buyPremium();
-                    // Navigator pop handled by listener or user manually closing?
-                    // Usually we keep it open until purchase succeeds.
-                    // But the original code popped it.
-                    // Let's NOT pop it immediately, so they see the process.
-                    // Or maybe pop it if they want to continue playing while it processes?
-                    // Better to keep it open or show a loading indicator.
-                    // For now, let's just trigger the buy flow.
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber,
