@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 class PurchaseService {
-  final InAppPurchase _iap = InAppPurchase.instance;
+  InAppPurchase? _iapInstance;
+  InAppPurchase get _iap => _iapInstance ??= InAppPurchase.instance;
+
   late StreamSubscription<List<PurchaseDetails>> _subscription;
   final Function(bool) onPremiumStatusChanged;
   final Function(String) onError;
@@ -10,7 +12,8 @@ class PurchaseService {
   PurchaseService({
     required this.onPremiumStatusChanged,
     required this.onError,
-  });
+    InAppPurchase? inAppPurchase,
+  }) : _iapInstance = inAppPurchase;
 
   Future<void> initialize() async {
     final Stream<List<PurchaseDetails>> purchaseUpdated = _iap.purchaseStream;

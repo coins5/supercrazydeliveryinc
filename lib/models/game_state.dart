@@ -180,7 +180,13 @@ class GameState extends ChangeNotifier {
   // Evolution notifications (kept here for now or move to UnitManager)
   List<String> evolutionNotifications = [];
 
-  GameState() {
+  GameState({
+    PurchaseService Function({
+      required Function(bool) onPremiumStatusChanged,
+      required Function(String) onError,
+    })?
+    purchaseServiceBuilder,
+  }) {
     // Listen to managers
     currencyManager.addListener(notifyListeners);
     unitManager.addListener(notifyListeners);
@@ -198,7 +204,7 @@ class GameState extends ChangeNotifier {
     _loadGame();
     _startTimer();
 
-    _purchaseService = PurchaseService(
+    _purchaseService = (purchaseServiceBuilder ?? PurchaseService.new)(
       onPremiumStatusChanged: (isPremium) {
         if (isPremium && !_isPremium) {
           activatePremium();
@@ -664,7 +670,18 @@ class GameState extends ChangeNotifier {
           if (_totalClicks >= achievement.threshold) unlocked = true;
           break;
         case AchievementType.unitCount:
-          if (totalUnitsPurchased >= achievement.threshold) unlocked = true;
+          if (achievement.targetUnitId != null) {
+            final unitIndex = units.indexWhere(
+              (u) => u.id == achievement.targetUnitId,
+            );
+            if (unitIndex != -1) {
+              if (units[unitIndex].count >= achievement.threshold) {
+                unlocked = true;
+              }
+            }
+          } else {
+            if (totalUnitsPurchased >= achievement.threshold) unlocked = true;
+          }
           break;
         case AchievementType.upgrades:
           if (totalUpgradesPurchased >= achievement.threshold) unlocked = true;
